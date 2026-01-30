@@ -2,12 +2,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import InputComponents from "../../CustomComponents/InputComponents/InputComponents"
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent"
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar"
-import { apiCall } from "../../Utils/AxiosUtils";
+import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
 import DropdownComponent from "../../CustomComponents/DropdownComponent/DropdownComponent";
 
 function AddSubCategories() {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false)
     const [subCategoryData, setSubCategoryData] = useState({
         name: "",
         category: ""
@@ -52,6 +53,7 @@ function AddSubCategories() {
             method: "GET",
             url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
             data: {},
+            setLoading: setLoading,
             callback: (response) => {
                 if (response.status === 200) {
                     const subcategory = response.data;
@@ -127,10 +129,11 @@ function AddSubCategories() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
-            <div className="w-4/5 p-6">
-                <h2 className="text-xl font-bold mb-4">
+            <div className="w-full p-4">
+                {loading && <Spinner/>}
+                <h2 className="text-xl font-serif mb-4">
                     {subcategory_id ? "Edit SubCategory" : "Add SubCategory"}
                 </h2>
                 <div className="mb-4">

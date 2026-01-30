@@ -2,7 +2,7 @@ import CustomDropdownComponent from "../../CustomComponents/CustomDropdownCompon
 import DropdownComponent from "../../CustomComponents/DropdownComponent/DropdownComponent";
 import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
-import { apiCall } from "../../Utils/AxiosUtils";
+import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import { useEffect, useState } from "react";
 import { FONT_FAMILY_OPTIONS } from "./Constants";
@@ -13,6 +13,7 @@ function AddTemplate() {
     const [templateFileBase64, setTemplateFileBase64] = useState("");
     const [categoriesData, setCategoriesData] = useState([]);
     const [subcategoryOptions, setSubcategoryOptions] = useState([]);
+    const [loading, setLoading] = useState(false)
     // const [fontFamily, setFontFamily] = useState("");
     // const [fontSize, setFontSize] = useState("");
     // const [fontColor, setFontColor] = useState("");
@@ -117,6 +118,7 @@ function AddTemplate() {
             url: "https://image-edit-backend.vercel.app/api/templates",
             data: requestData,
             callback: addTemplatesCallback,
+            setLoading: setLoading
         });
     }
     const getCategoriesData = () => {
@@ -158,10 +160,11 @@ function AddTemplate() {
         }
     };
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
             <div className="p-6 w-full">
-                <div className="bg-white p-6 rounded-lg shadow-md">
+                {loading && <Spinner />}
+                <div className="rounded-lg">
                     <div className="grid grid-cols-2 gap-x-5 gap-y-4">
                         <div className="flex flex-col">
                             <label className="font-serif font-bold mb-1">Template File</label>

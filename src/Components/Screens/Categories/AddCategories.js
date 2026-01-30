@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
-import { apiCall } from "../../Utils/AxiosUtils";
+import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useNavigate, useParams } from "react-router-dom";
 
 function AddCategories() {
@@ -10,6 +10,8 @@ function AddCategories() {
     const { category_id } = useParams();
     const [categoryData, setCategoryData] = useState({ name: "" });
     const [error, setError] = useState("");
+    // const [loading, setLoading] = (false)
+    const [loading, setLoading] = useState(false)
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setCategoryData({ ...categoryData, [name]: value });
@@ -29,6 +31,7 @@ function AddCategories() {
             url: `https://image-edit-backend.vercel.app/api/categories/${category_id}`,
             data: {},
             callback: getCategoryCallback,
+            setLoading: setLoading
         });
     };
 
@@ -43,7 +46,7 @@ function AddCategories() {
     const addCategoryCallback = (response) => {
         if (response.status === 200) {
             console.log("Category added successfully");
-            setCategoryData({ name: ""  });
+            setCategoryData({ name: "" });
             navigate("/categories");
         } else {
             console.log("Failed to add category");
@@ -82,9 +85,10 @@ function AddCategories() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
-            <div className="w-4/5 p-6">
+            <div className="w-full p-4">
+                {loading && <Spinner />}
                 <div className="mb-4">
                     <InputComponents
                         type="text"

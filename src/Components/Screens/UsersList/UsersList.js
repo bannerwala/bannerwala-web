@@ -56,21 +56,20 @@ function UsersList() {
         setExpandedRowIndex(expandedIndex => expandedIndex === index ? "" : index);
     };
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
             {loading && <Spinner />}
-            <div className="w-4/5 p-8">
-                <HeaderComponents
+            <div className="w-full p-4">
+                {/* <HeaderComponents
                     name="Users List"
+                /> */}  <div className="text-xl font-serif mb-3">Users List</div>
+                <TableComponent
+                    headers={headers}
+                    data={users}
+                    expandedRowIndex={expandedRowIndex}
+                    onRowClick={handleRowClick}
+                    maxHeight="h-[84vh]"
                 />
-                <div className="h-[84vh]">
-                    <TableComponent
-                        headers={headers}
-                        data={users}
-                        expandedRowIndex={expandedRowIndex}
-                        onRowClick={handleRowClick}
-                    />
-                </div>
             </div>
         </div>
 

@@ -6,24 +6,43 @@ import { useNavigate } from "react-router-dom";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
+import DropdownInputComponent from "../../CustomComponents/DropdownInputComponent/DropdownInputComponent";
 export default function Dashboard() {
     const [category, setCategory] = useState("");
     const [subcategory, setSubcategory] = useState("");
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [subcategoryOptions, setSubcategoryOptions] = useState([]);
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true)
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const limit = 2;
     const navigate = useNavigate();
-    useEffect(() => {
-        getTemplateData({ category: "", subcategory: "", offset: 0, isInitial: true });
-    }, []);
-    useEffect(() => {
-        if (hasMore && !loading) {
-            getTemplateData({ category, subcategory, offset, isInitial: false });
+    // useEffect(() => {
+    //     getTemplateData({ category: "", subcategory: "", offset: 0, isInitial: true });
+    // }, []);
+    // useEffect(() => {
+    //     if (hasMore && !loading) {
+    //         getTemplateData({ category, subcategory, offset, isInitial: false });
+    //     }
+    // }, [templates]);
+    const fetchCategoriesCallback = (response) => {
+        if (response.status === 200) {
+            const categories = response.data.map(c => c.name);
+            setCategoryOptions(categories);
+        } else {
+            console.error("Failed to fetch categories");
         }
-    }, [templates]);
+    };
 
+    const fetchSubcategoriesCallback = (response) => {
+        if (response.status === 200) {
+            const subcategories = response.data.map(s => s.name);
+            setSubcategoryOptions(subcategories);
+        } else {
+            console.error("Failed to fetch subcategories");
+        }
+    };
     const getTemplatesCallback = (response, offsetValue, isInitial) => {
         if (response.status === 200) {
             const newTemplates = response.data || [];
@@ -39,6 +58,32 @@ export default function Dashboard() {
         }
         if (isInitial) setLoading(false);
     };
+    const getCategoriesData = () => {
+        apiCall({
+            method: "GET",
+            url: "https://image-edit-backend.vercel.app/api/categories",
+            callback: fetchCategoriesCallback
+        });
+    };
+
+    const getSubcategoriesData = () => {
+        apiCall({
+            method: "GET",
+            url: "https://image-edit-backend.vercel.app/api/sub-categories",
+            callback: fetchSubcategoriesCallback
+        });
+    };
+    useEffect(() => {
+        getCategoriesData();
+        getSubcategoriesData();
+        getTemplateData({ category: "", subcategory: "", offset: 0, isInitial: true });
+    }, []);
+
+    useEffect(() => {
+        if (hasMore && !loading) {
+            getTemplateData({ category, subcategory, offset, isInitial: false });
+        }
+    }, [templates]);
 
     const getTemplateData = ({ category, subcategory, offset = 0, isInitial = false }) => {
         // let url = "https://image-edit-backend.vercel.app/api/templates?";
@@ -85,10 +130,10 @@ export default function Dashboard() {
         }
     };
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
             {loading && <Spinner />}
-            <div className="w-4/5 p-8">
+            <div className="w-full p-4">
                 <HeaderComponents
                     name="All Templates"
                     icon="fa fa-plus-circle"
@@ -99,7 +144,7 @@ export default function Dashboard() {
 
                 <div className="mb-6">
                     <div className="flex items-center gap-4 mb-5">
-                        <InputComponents
+                        {/* <InputComponents
                             type="text"
                             placeholder="Enter Category"
                             value={category}
@@ -113,24 +158,44 @@ export default function Dashboard() {
                             value={subcategory}
                             onChange={(e) => setSubcategory(e.target.value)}
                             inputClassName="w-[190px] "
-                        />
+                        /> */}
+                        <div>
+                            <DropdownInputComponent
+                                name="Category"
+                                placeholder="Select Category"
+                                options={categoryOptions}
+                                value={category}
+                                onChange={setCategory}
+                                dropdownClassName="w-[90%]"
+                            />
+                        </div>
+                        <div>
+                            <DropdownInputComponent
+                                name="Subcategory"
+                                placeholder="Select Subcategory"
+                                options={subcategoryOptions}
+                                value={subcategory}
+                                onChange={setSubcategory}
+                                dropdownClassName="w-[90%]"
+                            />
+                        </div>
                         <PrimaryButtonComponent
                             label="Search"
                             icon="fa fa-search"
                             onClick={handleSearchFilter}
-                            buttonClassName="py-1 px-3 text-sm font-bold"
+                            buttonClassName="py-1 px-3 text-sm font-bold mt-5"
 
                         />
                         <PrimaryButtonComponent
                             label="Reset"
                             icon="fa fa-refresh"
                             onClick={handleResetFilter}
-                            buttonClassName="py-1 px-3 text-sm font-bold"
+                            buttonClassName="py-1 px-3 text-sm font-bold mt-5"
 
                         />
                     </div>
                 </div>
-                <div  onScroll={handleScroll} className="grid grid-cols-5 gap-6 h-[70vh] overflow-y-auto">
+                <div onScroll={handleScroll} className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto">
                     {templates.map((cat, i) => (
                         <div key={i} className="cursor-pointer">
                             <CategoryCardComponent img={cat.url} />

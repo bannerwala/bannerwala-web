@@ -32,10 +32,10 @@ function SubscriptionPlans() {
         getPlans();
     }, []);
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
             {loading && <Spinner />}
-            <div className="w-4/5 p-8">
+            <div className="w-full p-4">
                 <HeaderComponents
                     name="Subscription Plans"
                     icon="fa fa-plus-circle"

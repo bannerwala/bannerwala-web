@@ -21,15 +21,8 @@ function Login() {
 
     const loginCallback = (response) => {
         if (response.status === 200) {
-            toast.success("Login successful!", {
-                position: "top-center",
-                autoClose: 2000,
-            });
-            setTimeout(() => {
-                navigate("/dashboard");
-            }, 2000);
+            navigate("/dashboard");
         } else {
-            // console.log("login failed");
             const errorMsg = response?.data?.error || "Login failed. Please check your credentials.";
             toast.error(errorMsg, {
                 position: "top-center",

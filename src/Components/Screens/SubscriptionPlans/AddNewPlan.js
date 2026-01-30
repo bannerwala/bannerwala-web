@@ -3,13 +3,14 @@ import InputComponents from "../../CustomComponents/InputComponents/InputCompone
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import { useEffect, useState } from "react";
-import { apiCall } from "../../Utils/AxiosUtils";
+import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import CustomDropdownComponent from "../../CustomComponents/CustomDropdownComponent/CustomDropdownComponent";
 
 function AddNewPlan() {
     const navigate = useNavigate();
     const { plan_id } = useParams();
     const statusOptions = ["Active", "Inactive"];
+    const [loading, setLoading] = useState(false)
     const [subscriptionPlan, setSubscriptionPlan] = useState({
         name: "",
         price: "",
@@ -32,6 +33,7 @@ function AddNewPlan() {
             url: `https://image-edit-backend.vercel.app/api/subscription-plans/${plan_id}`,
             data: {},
             callback: getSinglePlanCallback,
+            setLoading:setLoading
         });
     };
     const getSinglePlanCallback = (response) => {
@@ -49,7 +51,7 @@ function AddNewPlan() {
         }
     };
     const addPlanCallback = (response) => {
-        if (response.status === 200) {
+        if (response.status === 200 || response.status === 201) {
             console.log("Plan added successfully");
             setSubscriptionPlan({
                 name: "",
@@ -69,6 +71,7 @@ function AddNewPlan() {
             url: "https://image-edit-backend.vercel.app/api/subscription-plans",
             data: subscriptionPlan,
             callback: addPlanCallback,
+            setLoading: setLoading
         });
     };
     const updatePlan = () => {
@@ -77,6 +80,7 @@ function AddNewPlan() {
             url: `https://image-edit-backend.vercel.app/api/subscription-plans/${plan_id}`,
             data: subscriptionPlan,
             callback: updatePlanCallback,
+            setLoading:setLoading
         });
     };
     const updatePlanCallback = (response) => {
@@ -100,6 +104,7 @@ function AddNewPlan() {
         <div className="min-h-screen bg-gray-100 flex">
             <DashboardSideBar />
             <div className="p-8 w-full max-w-3xl mx-auto">
+                {loading && <Spinner />}
                 <div className="bg-white p-6 rounded-lg shadow-md space-y-6">
                     <h2 className="text-xl font-bold mb-4">
                         {plan_id ? "Edit Subscription Plan" : "Add New Subscription Plan"}

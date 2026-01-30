@@ -14,8 +14,7 @@ function SubCategories() {
     const [subCategories, setSubCategories] = useState([]);
     const [categoriesData, setCategoriesData] = useState([]);
     const [loading, setLoading] = useState(false)
-
-    const headers = ["name", "category", "action",];
+    const headers = ["Name", "Category", "Action"];
     const getCategoriesData = () => {
         const url = "https://image-edit-backend.vercel.app/api/categories";
         apiCall({
@@ -37,9 +36,11 @@ function SubCategories() {
     const getSubCategoriesCallback = (response) => {
         if (response.status === 200) {
             const subcategories = response.data.map(subcategory => ({
-                ...subcategory,
-                category: subcategory.category?.name || "N/A",
-                action: (
+                // ...subcategory,
+                // category: subcategory.category?.name || "N/A",
+                Name: subcategory.name,
+                Category: subcategory.category?.name,
+                Action: (
                     <div
                         className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 cursor-pointer"
                         title="Edit"
@@ -69,24 +70,23 @@ function SubCategories() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
             {loading && <Spinner />}
-            <div className="w-4/5 p-8">
+            <div className="w-full p-4">
                 <HeaderComponents
                     label="Add SubCategory"
                     name="SubCategories"
                     onClick={handleAddClick}
                     icon="fa fa-plus-circle"
-                    buttonClassName="py-1 px-3 text-sm font-bold"
+                    buttonClassName="py-1 px-3 text-sm font-bold mb-3"
                 />
-                <div className="w-full p-8 h-[84vh]">
-                    <TableComponent
-                        headers={headers}
-                        data={subCategories} />
+                <TableComponent
+                    headers={headers}
+                    data={subCategories}
+                    maxHeight=" h-[84vh]"
 
-                </div>
-
+                />
             </div>
         </div>
     )
