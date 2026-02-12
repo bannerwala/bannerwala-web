@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import TableComponent from "../../CustomComponents/TableComponent/TableComponent";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
 import { API_URLS } from "../../Utils/AppConst";
+import { SUB_CATEGORIES_COLUMNS } from "./Constants";
 
 function SubCategories() {
     const navigate = useNavigate();
@@ -15,7 +16,7 @@ function SubCategories() {
     const [subCategories, setSubCategories] = useState([]);
     const [categoriesData, setCategoriesData] = useState([]);
     const [loading, setLoading] = useState(false)
-    const headers = ["Name", "Category", "Action"];
+    // const headers = ["Name", "Category", "Action"];
     const getCategoriesData = () => {
         // const url = "https://image-edit-backend.vercel.app/api/categories";
         apiCall({
@@ -85,7 +86,7 @@ function SubCategories() {
                     buttonClassName="py-1 px-3 text-sm font-bold mb-3"
                 />
                 <TableComponent
-                    headers={headers}
+                    headers={ SUB_CATEGORIES_COLUMNS}
                     data={subCategories}
                     maxHeight=" h-[84vh]"
 

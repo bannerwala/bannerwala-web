@@ -4,26 +4,27 @@ import TableComponent from "../../CustomComponents/TableComponent/TableComponent
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
 import { API_URLS } from "../../Utils/AppConst";
+import { USERS_COLUMNS } from "./Constants";
 
 function UsersList() {
     const [users, setUsers] = useState([]);
     const [expandedRowIndex, setExpandedRowIndex] = useState("")
     const [loading, setLoading] = useState(false);
-    const headers = [
-        "Profile",
-        // "Email",
-        "Name",
-        "Contact No",
-        "Role",
-        "Plan",
-        "Designation",
-        // "JoinedDate",
-        // "Firm Name",
-        // "Gender",
-        // "Dob",
-        // "Address"
+    // const headers = [
+    //     "Profile",
+    //     // "Email",
+    //     "Name",
+    //     "Contact No",
+    //     "Role",
+    //     "Plan",
+    //     "Designation",
+    //     // "JoinedDate",
+    //     // "Firm Name",
+    //     // "Gender",
+    //     // "Dob",
+    //     // "Address"
 
-    ];
+    // ];
     const getUsersCallback = (response) => {
         if (response.status === 200) {
             const usersFormattedRows = response.data.map((user) => ({
@@ -71,7 +72,7 @@ function UsersList() {
                     name="Users List"
                 /> */}  <div className="text-xl font-serif mb-3">Users List</div>
                 <TableComponent
-                    headers={headers}
+                    headers={USERS_COLUMNS}
                     data={users}
                     expandedRowIndex={expandedRowIndex}
                     onRowClick={handleRowClick}

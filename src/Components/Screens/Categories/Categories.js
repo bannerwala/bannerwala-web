@@ -6,13 +6,14 @@ import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
 import { API_URLS } from "../../Utils/AppConst";
+import { CATEGORIES_COLUMNS } from "./Constants";
 
 function Categories() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
     // const headers = ["name", "action"];
-    const headers = ["Name", "Action"];
+    // const headers = ["Name", "Action"];
 
     const handleAddClick = () => {
         navigate("/add-category");
@@ -63,7 +64,7 @@ function Categories() {
                     buttonClassName="py-1 px-3 text-sm font-bold mb-2"
                 />
                 <TableComponent
-                    headers={headers}
+                    headers={CATEGORIES_COLUMNS}
                     data={categories}
                     maxHeight="h-[84vh]"
                     onRowClick={(row) => {
