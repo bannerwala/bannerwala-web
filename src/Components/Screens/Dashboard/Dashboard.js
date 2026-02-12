@@ -62,7 +62,6 @@ export default function Dashboard() {
     const getCategoriesData = () => {
         apiCall({
             method: "GET",
-            // url: "https://image-edit-backend.vercel.app/api/categories",
             url: API_URLS.CATEGORIES,
             callback: fetchCategoriesCallback
         });
@@ -83,7 +82,6 @@ export default function Dashboard() {
     //     });
     // };
     const getSubcategoriesData = (categoryName = "") => {
-        // let url = "https://image-edit-backend.vercel.app/api/sub-categories";
         let url = API_URLS.SUB_CATEGORIES;
         if (categoryName) {
             url += `?categoryName=${categoryName}`;
@@ -119,14 +117,11 @@ export default function Dashboard() {
     }, [templates]);
 
     const getTemplateData = ({ category, subcategory, offset = 0, isInitial = false }) => {
-        // let url = "https://image-edit-backend.vercel.app/api/templates?";
-        // let url = `https://image-edit-backend.vercel.app/api/templates?limit=${limit}&offset=${offset}`;
         let url = `${API_URLS.TEMPLATES}?limit=${limit}&offset=${offset}`;
         if (category) url += `&category=${category}`;
         if (subcategory) url += `&sub_category=${subcategory}`;
         apiCall({
             method: "GET",
-            // url: "https://image-edit-backend.vercel.app/api/templates",
             url,
             data: {},
             // callback: getTemplatesCallback,
@@ -175,24 +170,20 @@ export default function Dashboard() {
                     <div className="flex items-center gap-4 mb-5">
                         <div>
                             <DropdownInputComponent
-                                // name="Category"
                                 placeholder="Select Category"
                                 options={categoryOptions}
                                 value={category}
-                                // onChange={setCategory}
                                 onChange={handleCategoryChange}
                                 dropdownClassName="w-[90%]"
                             />
                         </div>
                         <div>
                             <DropdownInputComponent
-                                // name="Subcategory"
                                 placeholder="Select Subcategory"
                                 options={subcategoryOptions}
                                 value={subcategory}
                                 onChange={setSubcategory}
                                 dropdownClassName="w-[90%]"
-                            // disabled={!category}
                             />
                         </div>
                         <PrimaryButtonComponent

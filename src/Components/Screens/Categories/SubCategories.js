@@ -16,12 +16,9 @@ function SubCategories() {
     const [subCategories, setSubCategories] = useState([]);
     const [categoriesData, setCategoriesData] = useState([]);
     const [loading, setLoading] = useState(false)
-    // const headers = ["Name", "Category", "Action"];
     const getCategoriesData = () => {
-        // const url = "https://image-edit-backend.vercel.app/api/categories";
         apiCall({
             method: "GET",
-            // url: url,
             url: API_URLS.CATEGORIES,
             data: {},
             callback: getCategoriesCallback,
@@ -61,7 +58,6 @@ function SubCategories() {
     const getSubCategories = () => {
         apiCall({
             method: "GET",
-            // url: "https://image-edit-backend.vercel.app/api/sub-categories",
             url: API_URLS.SUB_CATEGORIES,
             data: {},
             callback: getSubCategoriesCallback,

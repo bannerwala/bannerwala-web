@@ -23,7 +23,6 @@ function SubscriptionPlans() {
     const getPlans = () => {
         apiCall({
             method: "GET",
-            // url: "https://image-edit-backend.vercel.app/api/subscription-plans",
             url: API_URLS.SUBSCRIPTION_PLANS,
             data: {},
             callback: getPlansCallback,

@@ -31,7 +31,6 @@ function AddNewPlan() {
     const getSinglePlan = () => {
         apiCall({
             method: "GET",
-            // url: `https://image-edit-backend.vercel.app/api/subscription-plans/${plan_id}`,
             url: `${API_URLS.SUBSCRIPTION_PLANS}/${plan_id}`,
             data: {},
             callback: getSinglePlanCallback,
@@ -70,7 +69,6 @@ function AddNewPlan() {
     const addNewPlan = () => {
         apiCall({
             method: "POST",
-            // url: "https://image-edit-backend.vercel.app/api/subscription-plans",
             url: API_URLS.SUBSCRIPTION_PLANS,
             data: subscriptionPlan,
             callback: addPlanCallback,
@@ -80,7 +78,6 @@ function AddNewPlan() {
     const updatePlan = () => {
         apiCall({
             method: "PUT",
-            // url: `https://image-edit-backend.vercel.app/api/subscription-plans/${plan_id}`,
             url: `${API_URLS.SUBSCRIPTION_PLANS}/${plan_id}`,
             data: subscriptionPlan,
             callback: updatePlanCallback,

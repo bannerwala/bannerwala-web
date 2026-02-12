@@ -32,10 +32,8 @@ function AddSubCategories() {
 
 
     const getCategoriesData = () => {
-        // const url = "https://image-edit-backend.vercel.app/api/categories";
         apiCall({
             method: "GET",
-            // url: url,
             url: API_URLS.CATEGORIES,
             data: {},
             callback: getCategoriesCallback,
@@ -53,7 +51,6 @@ function AddSubCategories() {
     const getSubCategoryById = () => {
         apiCall({
             method: "GET",
-            // url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
             url: `${API_URLS.SUB_CATEGORIES}/${subcategory_id}`,
             data: {},
             setLoading: setLoading,
@@ -101,7 +98,6 @@ function AddSubCategories() {
         }
         apiCall({
             method: "POST",
-            // url: "https://image-edit-backend.vercel.app/api/sub-categories",
             url: API_URLS.SUB_CATEGORIES,
             data: subCategoryData,
             callback: addSubCategoryCallback,
@@ -112,7 +108,6 @@ function AddSubCategories() {
 
         apiCall({
             method: "PUT",
-            // url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
             url: `${API_URLS.SUB_CATEGORIES}/${subcategory_id}`,
             data: subCategoryData,
             callback: (response) => {

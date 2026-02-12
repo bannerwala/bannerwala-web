@@ -11,7 +11,6 @@ function AddCategories() {
     const { category_id } = useParams();
     const [categoryData, setCategoryData] = useState({ name: "" });
     const [error, setError] = useState("");
-    // const [loading, setLoading] = (false)
     const [loading, setLoading] = useState(false)
     const handleInputChange = (event) => {
         const { name, value } = event.target;
@@ -29,7 +28,6 @@ function AddCategories() {
     const getSingleCategory = () => {
         apiCall({
             method: "GET",
-            // url: `https://image-edit-backend.vercel.app/api/categories/${category_id}`,
             url: `${API_URLS.CATEGORIES}/${category_id}`,
             data: {},
             callback: getCategoryCallback,
@@ -58,7 +56,6 @@ function AddCategories() {
     const addCategory = () => {
         apiCall({
             method: "POST",
-            // url: "https://image-edit-backend.vercel.app/api/categories",
             url: API_URLS.CATEGORIES,
             data: categoryData,
             callback: addCategoryCallback,
@@ -67,7 +64,6 @@ function AddCategories() {
     const updateCategory = () => {
         apiCall({
             method: "PUT",
-            // url: `https://image-edit-backend.vercel.app/api/categories/${category_id}`,
             url: `${API_URLS.CATEGORIES}/${category_id}`,
             data: categoryData,
             callback: addCategoryCallback,

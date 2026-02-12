@@ -49,12 +49,6 @@ function AddTemplate() {
         };
         reader.readAsDataURL(file);
     };
-
-    // useEffect(() => {
-    //     getCategoriesData();
-    //     getSubcategoriesData();
-    //     getPlansData();
-    // }, []);
     useEffect(() => {
         getCategoriesData();
         // getSubcategoriesData();
@@ -66,7 +60,6 @@ function AddTemplate() {
     const getPlansData = () => {
         apiCall({
             method: "GET",
-            // url: "https://image-edit-backend.vercel.app/api/subscription-plans",
             url: API_URLS.SUBSCRIPTION_PLANS,
             data: {},
             callback: getPlansCallback,
@@ -128,7 +121,6 @@ function AddTemplate() {
         };
         apiCall({
             method: "POST",
-            // url: "https://image-edit-backend.vercel.app/api/templates",
             url: API_URLS.TEMPLATES,
             data: requestData,
             callback: addTemplatesCallback,
@@ -136,7 +128,6 @@ function AddTemplate() {
         });
     }
     const getCategoriesData = () => {
-        // let url = "https://image-edit-backend.vercel.app/api/categories";
         let url = API_URLS.CATEGORIES;
         apiCall({
             method: 'GET',
@@ -165,7 +156,6 @@ function AddTemplate() {
     //     });
     // };
     const getSubcategoriesData = (categoryName) => {
-        // let url = "https://image-edit-backend.vercel.app/api/sub-categories";
         let url = API_URLS.SUB_CATEGORIES;
         if (categoryName) {
             url += `?categoryName=${categoryName}`;
@@ -202,7 +192,6 @@ function AddTemplate() {
     const getTemplateData = () => {
         apiCall({
             method: "GET",
-            // url: `https://image-edit-backend.vercel.app/api/templates/${template_id}`,
             url: `${API_URLS.TEMPLATES}/${template_id}`,
             data: {},
             callback: getTemplateDataCallback,
@@ -259,7 +248,6 @@ function AddTemplate() {
         };
         apiCall({
             method: "PUT",
-            // url: `https://image-edit-backend.vercel.app/api/templates/${template_id}`,
             url: `${API_URLS.TEMPLATES}/${template_id}`,
             data: requestData,
             callback: editTemplateCallback,

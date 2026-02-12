@@ -12,16 +12,12 @@ function Categories() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
-    // const headers = ["name", "action"];
-    // const headers = ["Name", "Action"];
-
     const handleAddClick = () => {
         navigate("/add-category");
     };
     const getCategoriesCallback = (response) => {
         if (response.status === 200) {
             const updated = response.data.map((category) => ({
-                // ...category,
                 Name: category.name,
                 Action: (
                     <div
@@ -41,7 +37,6 @@ function Categories() {
     const getCategories = () => {
         apiCall({
             method: "GET",
-            // url: "https://image-edit-backend.vercel.app/api/categories",
             url: API_URLS.CATEGORIES,
             callback: getCategoriesCallback,
             setLoading: setLoading

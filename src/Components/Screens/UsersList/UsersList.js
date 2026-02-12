@@ -10,21 +10,6 @@ function UsersList() {
     const [users, setUsers] = useState([]);
     const [expandedRowIndex, setExpandedRowIndex] = useState("")
     const [loading, setLoading] = useState(false);
-    // const headers = [
-    //     "Profile",
-    //     // "Email",
-    //     "Name",
-    //     "Contact No",
-    //     "Role",
-    //     "Plan",
-    //     "Designation",
-    //     // "JoinedDate",
-    //     // "Firm Name",
-    //     // "Gender",
-    //     // "Dob",
-    //     // "Address"
-
-    // ];
     const getUsersCallback = (response) => {
         if (response.status === 200) {
             const usersFormattedRows = response.data.map((user) => ({
@@ -50,7 +35,6 @@ function UsersList() {
     const getUsers = () => {
         apiCall({
             method: "GET",
-            // url: "https://image-edit-backend.vercel.app/api/users",
             url: API_URLS.USERS,
             data: {},
             callback: getUsersCallback,
@@ -68,9 +52,7 @@ function UsersList() {
             <DashboardSideBar />
             {loading && <Spinner />}
             <div className="w-full p-4">
-                {/* <HeaderComponents
-                    name="Users List"
-                /> */}  <div className="text-xl font-serif mb-3">Users List</div>
+                <div className="text-xl font-serif mb-3">Users List</div>
                 <TableComponent
                     headers={USERS_COLUMNS}
                     data={users}
