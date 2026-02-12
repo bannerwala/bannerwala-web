@@ -1,59 +1,50 @@
 import { useState } from "react";
 
-function DropdownComponent({ label, options = [], value = [], onChange, dropdownClassName = "", error }) {
+function DropdownComponent({ label, options = [], value = "", onChange, dropdownClassName = "", error }) {
     const [isOpen, setIsOpen] = useState(false);
 
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
+    const toggleDropdown = () => setIsOpen(!isOpen);
 
     const handleCheckboxChange = (option) => {
-        if (value.includes(option)) {
-            onChange(value.filter((item) => item !== option));
+        const values = value ? value.split(", ") : [];
+        if (values.includes(option)) {
+            const newValue = values.filter((v) => v !== option).join(", ");
+            onChange(newValue);
         } else {
-            onChange([...value, option]);
+            const newValue = [...values, option].join(", ");
+            onChange(newValue);
         }
         setIsOpen(false);
     };
+    const selected = value ? value.split(", ") : [];
 
     return (
         <div className={`relative ${dropdownClassName}`}>
             <label className="font-semibold mb-1 block">{label}</label>
-            {/* <div
-                className="mt-2 p-2 border border-gray-300 rounded bg-white cursor-pointer"
-                onClick={toggleDropdown}
-            >
-                {value.length > 0 ? value.join(", ") : `Select ${label}`}
-            </div> */}
             <div
                 className="mt-2 p-2 border border-gray-300 rounded bg-white cursor-pointer"
                 onClick={toggleDropdown}
             >
-                {value?.join ? value.join(", ") : `Select ${label}`}
+                {value || `Select ${label}`}
             </div>
 
             {isOpen && (
                 <div className="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded shadow">
                     {options.map((option, idx) => (
-                        <label
-                            key={idx}
-                            className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        >
+                        <label key={idx} className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
                             <input
                                 type="checkbox"
-                                checked={value.includes(option)}
+                                checked={selected.includes(option)}
                                 onChange={() => handleCheckboxChange(option)}
                                 className="mr-2"
                             />
                             {option}
                         </label>
-
                     ))}
                 </div>
             )}
-            {error && (
-                <div className="text-red-600 text-sm mt-1">{error}</div>
-            )}
+
+            {error && <div className="text-red-600 text-sm mt-1">{error}</div>}
         </div>
     );
 }

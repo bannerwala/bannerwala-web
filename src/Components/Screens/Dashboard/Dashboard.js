@@ -7,6 +7,7 @@ import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
 import DropdownInputComponent from "../../CustomComponents/DropdownInputComponent/DropdownInputComponent";
+import { API_URLS } from "../../Utils/AppConst";
 export default function Dashboard() {
     const [category, setCategory] = useState("");
     const [subcategory, setSubcategory] = useState("");
@@ -61,18 +62,50 @@ export default function Dashboard() {
     const getCategoriesData = () => {
         apiCall({
             method: "GET",
-            url: "https://image-edit-backend.vercel.app/api/categories",
+            // url: "https://image-edit-backend.vercel.app/api/categories",
+            url: API_URLS.CATEGORIES,
             callback: fetchCategoriesCallback
         });
     };
 
-    const getSubcategoriesData = () => {
+    // const getSubcategoriesData = () => {
+    //     apiCall({
+    //         method: "GET",
+    //         url: "https://image-edit-backend.vercel.app/api/sub-categories",
+    //         callback: fetchSubcategoriesCallback
+    //     });
+    // };
+    // const getSubcategoriesData = (categoryName) => {
+    //     apiCall({
+    //         method: "GET",
+    //         url: `https://image-edit-backend.vercel.app/api/sub-categories?categoryName=${categoryName}`,
+    //         callback: fetchSubcategoriesCallback
+    //     });
+    // };
+    const getSubcategoriesData = (categoryName = "") => {
+        // let url = "https://image-edit-backend.vercel.app/api/sub-categories";
+        let url = API_URLS.SUB_CATEGORIES;
+        if (categoryName) {
+            url += `?categoryName=${categoryName}`;
+        }
+
         apiCall({
             method: "GET",
-            url: "https://image-edit-backend.vercel.app/api/sub-categories",
+            url,
             callback: fetchSubcategoriesCallback
         });
     };
+    const handleCategoryChange = (value) => {
+        setCategory(value);
+        setSubcategory("");
+
+        if (value) {
+            getSubcategoriesData(value);
+        } else {
+            getSubcategoriesData();
+        }
+    };
+
     useEffect(() => {
         getCategoriesData();
         getSubcategoriesData();
@@ -87,19 +120,14 @@ export default function Dashboard() {
 
     const getTemplateData = ({ category, subcategory, offset = 0, isInitial = false }) => {
         // let url = "https://image-edit-backend.vercel.app/api/templates?";
-        let url = `https://image-edit-backend.vercel.app/api/templates?limit=${limit}&offset=${offset}`;
-        // if (category) {
-        //     url += `category=${category}&`;
-        // }
-        // if (subcategory) {
-        //     url += `sub_category=${subcategory}`;
-        // }
+        // let url = `https://image-edit-backend.vercel.app/api/templates?limit=${limit}&offset=${offset}`;
+        let url = `${API_URLS.TEMPLATES}?limit=${limit}&offset=${offset}`;
         if (category) url += `&category=${category}`;
         if (subcategory) url += `&sub_category=${subcategory}`;
         apiCall({
             method: "GET",
             // url: "https://image-edit-backend.vercel.app/api/templates",
-            url: url,
+            url,
             data: {},
             // callback: getTemplatesCallback,
             callback: (response) => getTemplatesCallback(response, offset),
@@ -118,6 +146,7 @@ export default function Dashboard() {
         setOffset(0);
         setHasMore(true);
         setTemplates([]);
+        getSubcategoriesData();
         getTemplateData({ category: "", subcategory: "", offset: 0, isInitial: true });
     };
     const handleAddTemplateClick = () => {
@@ -144,64 +173,65 @@ export default function Dashboard() {
 
                 <div className="mb-6">
                     <div className="flex items-center gap-4 mb-5">
-                        {/* <InputComponents
-                            type="text"
-                            placeholder="Enter Category"
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            inputClassName="w-[190px]"
-
-                        />
-                        <InputComponents
-                            type="text"
-                            placeholder="Enter Subcategory"
-                            value={subcategory}
-                            onChange={(e) => setSubcategory(e.target.value)}
-                            inputClassName="w-[190px] "
-                        /> */}
                         <div>
                             <DropdownInputComponent
-                                name="Category"
+                                // name="Category"
                                 placeholder="Select Category"
                                 options={categoryOptions}
                                 value={category}
-                                onChange={setCategory}
+                                // onChange={setCategory}
+                                onChange={handleCategoryChange}
                                 dropdownClassName="w-[90%]"
                             />
                         </div>
                         <div>
                             <DropdownInputComponent
-                                name="Subcategory"
+                                // name="Subcategory"
                                 placeholder="Select Subcategory"
                                 options={subcategoryOptions}
                                 value={subcategory}
                                 onChange={setSubcategory}
                                 dropdownClassName="w-[90%]"
+                            // disabled={!category}
                             />
                         </div>
                         <PrimaryButtonComponent
                             label="Search"
                             icon="fa fa-search"
                             onClick={handleSearchFilter}
-                            buttonClassName="py-1 px-3 text-sm font-bold mt-5"
+                            buttonClassName="py-1 px-3 text-sm font-bold"
 
                         />
                         <PrimaryButtonComponent
                             label="Reset"
                             icon="fa fa-refresh"
                             onClick={handleResetFilter}
-                            buttonClassName="py-1 px-3 text-sm font-bold mt-5"
+                            buttonClassName="py-1 px-3 text-sm font-bold "
 
                         />
                     </div>
                 </div>
-                <div onScroll={handleScroll} className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto">
+                {/* <div onScroll={handleScroll} className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto">
                     {templates.map((cat, i) => (
                         <div key={i} className="cursor-pointer">
                             <CategoryCardComponent img={cat.url} />
                         </div>
                     ))}
+                </div> */}
+                <div onScroll={handleScroll} className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto">
+                    {templates && templates.map((cat, i) => (
+                        <div key={i} className="relative cursor-pointer group">
+                            <CategoryCardComponent img={cat.url} />
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300">
+                                <i
+                                    className="fa fa-edit text-white bg-black p-1 rounded cursor-pointer"
+                                    onClick={() => navigate(`/add-template/${cat._id}`)}
+                                />
+                            </div>
+                        </div>
+                    ))}
                 </div>
+
 
             </div>
         </div>

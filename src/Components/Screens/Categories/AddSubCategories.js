@@ -5,6 +5,7 @@ import DashboardSideBar from "../DashboardSideBar/DashboardSideBar"
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
 import DropdownComponent from "../../CustomComponents/DropdownComponent/DropdownComponent";
+import { API_URLS } from "../../Utils/AppConst";
 
 function AddSubCategories() {
     const navigate = useNavigate();
@@ -31,10 +32,11 @@ function AddSubCategories() {
 
 
     const getCategoriesData = () => {
-        const url = "https://image-edit-backend.vercel.app/api/categories";
+        // const url = "https://image-edit-backend.vercel.app/api/categories";
         apiCall({
             method: "GET",
-            url: url,
+            // url: url,
+            url: API_URLS.CATEGORIES,
             data: {},
             callback: getCategoriesCallback,
         });
@@ -51,7 +53,8 @@ function AddSubCategories() {
     const getSubCategoryById = () => {
         apiCall({
             method: "GET",
-            url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
+            // url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
+            url: `${API_URLS.SUB_CATEGORIES}/${subcategory_id}`,
             data: {},
             setLoading: setLoading,
             callback: (response) => {
@@ -98,7 +101,8 @@ function AddSubCategories() {
         }
         apiCall({
             method: "POST",
-            url: "https://image-edit-backend.vercel.app/api/sub-categories",
+            // url: "https://image-edit-backend.vercel.app/api/sub-categories",
+            url: API_URLS.SUB_CATEGORIES,
             data: subCategoryData,
             callback: addSubCategoryCallback,
         });
@@ -108,7 +112,8 @@ function AddSubCategories() {
 
         apiCall({
             method: "PUT",
-            url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
+            // url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
+            url: `${API_URLS.SUB_CATEGORIES}/${subcategory_id}`,
             data: subCategoryData,
             callback: (response) => {
                 if (response.status === 200) {
@@ -132,7 +137,7 @@ function AddSubCategories() {
         <div className="min-h-screen flex">
             <DashboardSideBar />
             <div className="w-full p-4">
-                {loading && <Spinner/>}
+                {loading && <Spinner />}
                 <h2 className="text-xl font-serif mb-4">
                     {subcategory_id ? "Edit SubCategory" : "Add SubCategory"}
                 </h2>

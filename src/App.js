@@ -21,7 +21,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/add-template" element={<AddTemplate />} />
+          {/* <Route path="/add-template" element={<AddTemplate />} /> */}
+          {/* <Route path="/add-template/:templateId" element={<AddTemplate />} /> */}
+          <Route path="/add-template/:template_id?" element={<AddTemplate />} />
           <Route path="/users" element={<UsersList />} />
           <Route path="/plans" element={<SubscriptionPlans />} />
           {/* <Route path="/add-plan" element={<AddNewPlan />} /> */}

@@ -3,6 +3,7 @@ import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import TableComponent from "../../CustomComponents/TableComponent/TableComponent";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
+import { API_URLS } from "../../Utils/AppConst";
 
 function UsersList() {
     const [users, setUsers] = useState([]);
@@ -10,10 +11,12 @@ function UsersList() {
     const [loading, setLoading] = useState(false);
     const headers = [
         "Profile",
+        // "Email",
         "Name",
         "Contact No",
         "Role",
         "Plan",
+        "Designation",
         // "JoinedDate",
         // "Firm Name",
         // "Gender",
@@ -25,7 +28,9 @@ function UsersList() {
         if (response.status === 200) {
             const usersFormattedRows = response.data.map((user) => ({
                 "Profile": user.profile_pic,
+                "Email": user.email_id,
                 "Name": user.name,
+                // "Email": user.email_id,
                 "Contact No": user.contact_number,
                 "Role": user.role,
                 // "Plan": user.subscription_details,
@@ -33,6 +38,7 @@ function UsersList() {
                 "Gender": user.gender,
                 "Dob": user.DOB,
                 "Address": user.address,
+                "Designation": user.designation,
                 id: user.id
             }));
             setUsers(usersFormattedRows);
@@ -43,7 +49,8 @@ function UsersList() {
     const getUsers = () => {
         apiCall({
             method: "GET",
-            url: "https://image-edit-backend.vercel.app/api/users",
+            // url: "https://image-edit-backend.vercel.app/api/users",
+            url: API_URLS.USERS,
             data: {},
             callback: getUsersCallback,
             setLoading: setLoading

@@ -4,6 +4,7 @@ import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_URLS } from "../../Utils/AppConst";
 
 function AddCategories() {
     const navigate = useNavigate();
@@ -28,7 +29,8 @@ function AddCategories() {
     const getSingleCategory = () => {
         apiCall({
             method: "GET",
-            url: `https://image-edit-backend.vercel.app/api/categories/${category_id}`,
+            // url: `https://image-edit-backend.vercel.app/api/categories/${category_id}`,
+            url: `${API_URLS.CATEGORIES}/${category_id}`,
             data: {},
             callback: getCategoryCallback,
             setLoading: setLoading
@@ -56,7 +58,8 @@ function AddCategories() {
     const addCategory = () => {
         apiCall({
             method: "POST",
-            url: "https://image-edit-backend.vercel.app/api/categories",
+            // url: "https://image-edit-backend.vercel.app/api/categories",
+            url: API_URLS.CATEGORIES,
             data: categoryData,
             callback: addCategoryCallback,
         });
@@ -64,7 +67,8 @@ function AddCategories() {
     const updateCategory = () => {
         apiCall({
             method: "PUT",
-            url: `https://image-edit-backend.vercel.app/api/categories/${category_id}`,
+            // url: `https://image-edit-backend.vercel.app/api/categories/${category_id}`,
+            url: `${API_URLS.CATEGORIES}/${category_id}`,
             data: categoryData,
             callback: addCategoryCallback,
         });

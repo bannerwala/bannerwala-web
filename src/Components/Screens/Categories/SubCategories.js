@@ -5,6 +5,7 @@ import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
 import TableComponent from "../../CustomComponents/TableComponent/TableComponent";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
+import { API_URLS } from "../../Utils/AppConst";
 
 function SubCategories() {
     const navigate = useNavigate();
@@ -16,10 +17,11 @@ function SubCategories() {
     const [loading, setLoading] = useState(false)
     const headers = ["Name", "Category", "Action"];
     const getCategoriesData = () => {
-        const url = "https://image-edit-backend.vercel.app/api/categories";
+        // const url = "https://image-edit-backend.vercel.app/api/categories";
         apiCall({
             method: "GET",
-            url: url,
+            // url: url,
+            url: API_URLS.CATEGORIES,
             data: {},
             callback: getCategoriesCallback,
         });
@@ -58,7 +60,8 @@ function SubCategories() {
     const getSubCategories = () => {
         apiCall({
             method: "GET",
-            url: "https://image-edit-backend.vercel.app/api/sub-categories",
+            // url: "https://image-edit-backend.vercel.app/api/sub-categories",
+            url: API_URLS.SUB_CATEGORIES,
             data: {},
             callback: getSubCategoriesCallback,
             setLoading: setLoading

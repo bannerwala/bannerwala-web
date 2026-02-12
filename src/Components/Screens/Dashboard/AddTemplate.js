@@ -6,7 +6,11 @@ import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import { useEffect, useState } from "react";
 import { FONT_FAMILY_OPTIONS } from "./Constants";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { API_URLS } from "../../Utils/AppConst";
 function AddTemplate() {
+    const navigate = useNavigate();
     const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedSubcategory, setSelectedSubcategory] = useState("");
     const [selectedPlan, setSelectedPlan] = useState("");
@@ -35,7 +39,7 @@ function AddTemplate() {
     //     size: "",
     //     color: ""
     // });
-
+    const { template_id } = useParams();
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -46,16 +50,24 @@ function AddTemplate() {
         reader.readAsDataURL(file);
     };
 
+    // useEffect(() => {
+    //     getCategoriesData();
+    //     getSubcategoriesData();
+    //     getPlansData();
+    // }, []);
     useEffect(() => {
         getCategoriesData();
-        getSubcategoriesData();
+        // getSubcategoriesData();
         getPlansData();
-    }, []);
+        if (template_id) getTemplateData();
+    }, [template_id]);
+
 
     const getPlansData = () => {
         apiCall({
             method: "GET",
-            url: "https://image-edit-backend.vercel.app/api/subscription-plans",
+            // url: "https://image-edit-backend.vercel.app/api/subscription-plans",
+            url: API_URLS.SUBSCRIPTION_PLANS,
             data: {},
             callback: getPlansCallback,
         });
@@ -74,6 +86,7 @@ function AddTemplate() {
         console.log('response: ', response);
         if (response.status === 200) {
             console.log("Template added successfully!");
+            navigate("/dashboard")
         } else {
             console.log("Failed to add template.");
         };
@@ -115,14 +128,16 @@ function AddTemplate() {
         };
         apiCall({
             method: "POST",
-            url: "https://image-edit-backend.vercel.app/api/templates",
+            // url: "https://image-edit-backend.vercel.app/api/templates",
+            url: API_URLS.TEMPLATES,
             data: requestData,
             callback: addTemplatesCallback,
             setLoading: setLoading
         });
     }
     const getCategoriesData = () => {
-        let url = "https://image-edit-backend.vercel.app/api/categories";
+        // let url = "https://image-edit-backend.vercel.app/api/categories";
+        let url = API_URLS.CATEGORIES;
         apiCall({
             method: 'GET',
             url: url,
@@ -140,8 +155,21 @@ function AddTemplate() {
             console.log("Error fetching categories");
         }
     };
-    const getSubcategoriesData = () => {
-        let url = "https://image-edit-backend.vercel.app/api/sub-categories";
+    // const getSubcategoriesData = () => {
+    //     let url = "https://image-edit-backend.vercel.app/api/sub-categories";
+    //     apiCall({
+    //         method: 'GET',
+    //         url: url,
+    //         data: {},
+    //         callback: getSubcategoriesCallback,
+    //     });
+    // };
+    const getSubcategoriesData = (categoryName) => {
+        // let url = "https://image-edit-backend.vercel.app/api/sub-categories";
+        let url = API_URLS.SUB_CATEGORIES;
+        if (categoryName) {
+            url += `?categoryName=${categoryName}`;
+        }
         apiCall({
             method: 'GET',
             url: url,
@@ -149,6 +177,18 @@ function AddTemplate() {
             callback: getSubcategoriesCallback,
         });
     };
+    const handleCategoryChange = (value) => {
+        setSelectedCategory(value);
+        setSelectedSubcategory("");      // old selection clear
+        setSubcategoryOptions([]);       // old options clear
+
+        if (value) {
+            getSubcategoriesData(value); // category-wise API call
+        }
+
+        setErrors(errors => ({ ...errors, category: "" }));
+    };
+
 
     const getSubcategoriesCallback = (response) => {
         if (response.status === 200) {
@@ -159,12 +199,103 @@ function AddTemplate() {
             console.log("Error fetching subcategories");
         }
     };
+    const getTemplateData = () => {
+        apiCall({
+            method: "GET",
+            // url: `https://image-edit-backend.vercel.app/api/templates/${template_id}`,
+            url: `${API_URLS.TEMPLATES}/${template_id}`,
+            data: {},
+            callback: getTemplateDataCallback,
+            setLoading
+        });
+    };
+    // const getTemplateDataCallback = (response) => {
+    //     if (response.status === 200) {
+    //         const templateData = response.data;
+
+    //         setSelectedPlan(templateData.plans || "");
+    //         setSelectedCategory(templateData.categories || "").join(",");
+    //         setSelectedSubcategory(templateData.sub_categories || "");
+    //         setTemplateFileBase64(templateData.url || "");
+    //         setIsMultiImageBanner(templateData.has_multiple_images || false);
+    //     } else {
+    //         const errorMsg = response?.data?.error || "Failed to fetch template data";
+    //         toast.error(errorMsg, {
+    //             position: "top-center",
+    //             autoClose: 2000,
+    //         });
+    //     }
+    // };
+    const getTemplateDataCallback = (response) => {
+        if (response.status === 200) {
+            const templateData = response.data;
+            const selectedCategories = templateData.categories.map(category => category.name);
+            const selectedSubcategories = templateData.sub_categories.map(subcategory => subcategory.name);
+            const selectedPlans = templateData.plans.map(plan => plan.name);
+
+
+            setSelectedPlan(selectedPlans || "");
+            setSelectedCategory(selectedCategories);
+            setSelectedSubcategory(selectedSubcategories);
+            setTemplateFileBase64(templateData.url || "");
+            setIsMultiImageBanner(templateData.has_multiple_images || false);
+        } else {
+            const errorMsg = response?.data?.error || "Failed to fetch template data";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
+        }
+    };
+
+    const editTemplateData = () => {
+        if (!validateTemplateData()) return;
+        const requestData = {
+            plans: selectedPlan,
+            categories: selectedCategory,
+            sub_categories: selectedSubcategory,
+            url: templateFileBase64,
+            has_multiple_images: isMultiImageBanner
+        };
+        apiCall({
+            method: "PUT",
+            // url: `https://image-edit-backend.vercel.app/api/templates/${template_id}`,
+            url: `${API_URLS.TEMPLATES}/${template_id}`,
+            data: requestData,
+            callback: editTemplateCallback,
+            setLoading
+        });
+    };
+    const editTemplateCallback = (response) => {
+        if (response.status === 200) {
+            toast.success("Template updated successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
+            navigate("/dashboard");
+        } else {
+            const errorMsg = response?.data?.error || "Failed to update template";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
+        }
+    };
+
+    const handleSubmit = () => {
+        if (template_id)
+            editTemplateData();
+        else
+            addTemplateData();
+    };
+
     return (
         <div className="min-h-screen flex">
             <DashboardSideBar />
             <div className="p-6 w-full">
                 {loading && <Spinner />}
                 <div className="rounded-lg">
+                    <h2 className="text-xl font-serif mb-4">{template_id ? "Edit Template" : "Add Template"}</h2>
                     <div className="grid grid-cols-2 gap-x-5 gap-y-4">
                         <div className="flex flex-col">
                             <label className="font-serif font-bold mb-1">Template File</label>
@@ -197,10 +328,11 @@ function AddTemplate() {
                             label="Category"
                             options={categoriesData}
                             value={selectedCategory}
-                            onChange={(value) => {
-                                setSelectedCategory(value);
-                                setErrors(errors => ({ ...errors, category: "" }));
-                            }}
+                            // onChange={(value) => {
+                            //     setSelectedCategory(value);
+                            //     setErrors(errors => ({ ...errors, category: "" }));
+                            // }}
+                            onChange={handleCategoryChange}
                             dropdownClassName="w-[80%]"
                             labelClassName="font-serif font-bold"
                             error={errors.category}
@@ -216,6 +348,7 @@ function AddTemplate() {
                             dropdownClassName="w-[80%]"
                             labelClassName="font-serif font-bold"
                             error={errors.subcategory}
+                            disabled={!selectedCategory}
                         />
 
                         <div className="flex items-center gap-2 mt-4">
@@ -355,7 +488,8 @@ function AddTemplate() {
                         <PrimaryButtonComponent
                             label="Submit"
                             buttonClassName="bg-black text-white px-6 py-2 text-sm rounded-md"
-                            onClick={addTemplateData}
+                            // onClick={addTemplateData}
+                            onClick={handleSubmit}
                         />
                     </div>
 

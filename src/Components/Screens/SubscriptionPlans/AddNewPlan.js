@@ -5,6 +5,7 @@ import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import { useEffect, useState } from "react";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import CustomDropdownComponent from "../../CustomComponents/CustomDropdownComponent/CustomDropdownComponent";
+import { API_URLS } from "../../Utils/AppConst";
 
 function AddNewPlan() {
     const navigate = useNavigate();
@@ -30,10 +31,11 @@ function AddNewPlan() {
     const getSinglePlan = () => {
         apiCall({
             method: "GET",
-            url: `https://image-edit-backend.vercel.app/api/subscription-plans/${plan_id}`,
+            // url: `https://image-edit-backend.vercel.app/api/subscription-plans/${plan_id}`,
+            url: `${API_URLS.SUBSCRIPTION_PLANS}/${plan_id}`,
             data: {},
             callback: getSinglePlanCallback,
-            setLoading:setLoading
+            setLoading: setLoading
         });
     };
     const getSinglePlanCallback = (response) => {
@@ -68,7 +70,8 @@ function AddNewPlan() {
     const addNewPlan = () => {
         apiCall({
             method: "POST",
-            url: "https://image-edit-backend.vercel.app/api/subscription-plans",
+            // url: "https://image-edit-backend.vercel.app/api/subscription-plans",
+            url: API_URLS.SUBSCRIPTION_PLANS,
             data: subscriptionPlan,
             callback: addPlanCallback,
             setLoading: setLoading
@@ -77,10 +80,11 @@ function AddNewPlan() {
     const updatePlan = () => {
         apiCall({
             method: "PUT",
-            url: `https://image-edit-backend.vercel.app/api/subscription-plans/${plan_id}`,
+            // url: `https://image-edit-backend.vercel.app/api/subscription-plans/${plan_id}`,
+            url: `${API_URLS.SUBSCRIPTION_PLANS}/${plan_id}`,
             data: subscriptionPlan,
             callback: updatePlanCallback,
-            setLoading:setLoading
+            setLoading: setLoading
         });
     };
     const updatePlanCallback = (response) => {

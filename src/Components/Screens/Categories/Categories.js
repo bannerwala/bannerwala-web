@@ -5,6 +5,7 @@ import TableComponent from "../../CustomComponents/TableComponent/TableComponent
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
+import { API_URLS } from "../../Utils/AppConst";
 
 function Categories() {
     const [categories, setCategories] = useState([]);
@@ -39,7 +40,8 @@ function Categories() {
     const getCategories = () => {
         apiCall({
             method: "GET",
-            url: "https://image-edit-backend.vercel.app/api/categories",
+            // url: "https://image-edit-backend.vercel.app/api/categories",
+            url: API_URLS.CATEGORIES,
             callback: getCategoriesCallback,
             setLoading: setLoading
         });
