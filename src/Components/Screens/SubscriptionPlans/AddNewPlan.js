@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import CustomDropdownComponent from "../../CustomComponents/CustomDropdownComponent/CustomDropdownComponent";
 import { API_URLS } from "../../Utils/AppConst";
+import { toast } from "react-toastify";
 
 function AddNewPlan() {
     const navigate = useNavigate();
@@ -53,7 +54,10 @@ function AddNewPlan() {
     };
     const addPlanCallback = (response) => {
         if (response.status === 200 || response.status === 201) {
-            console.log("Plan added successfully");
+            toast.success("Plan added successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
             setSubscriptionPlan({
                 name: "",
                 price: "",
@@ -63,7 +67,11 @@ function AddNewPlan() {
             });
             navigate("/plans");
         } else {
-            console.log("Failed to add plan");
+            const errorMsg = response?.data?.error || "Failed to add plan";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
         }
     };
     const addNewPlan = () => {
@@ -86,10 +94,17 @@ function AddNewPlan() {
     };
     const updatePlanCallback = (response) => {
         if (response.status === 200) {
-            console.log("Plan updated successfully");
+            toast.success("Plan updated successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
             navigate("/plans");
         } else {
-            console.log("Failed to update plan");
+            const errorMsg = response?.data?.error || "Failed to  update plan";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
         }
     };
     const handleSubmit = () => {

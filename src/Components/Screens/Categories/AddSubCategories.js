@@ -6,6 +6,7 @@ import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
 import DropdownComponent from "../../CustomComponents/DropdownComponent/DropdownComponent";
 import { API_URLS } from "../../Utils/AppConst";
+import { toast } from "react-toastify";
 
 function AddSubCategories() {
     const navigate = useNavigate();
@@ -48,42 +49,49 @@ function AddSubCategories() {
             console.log("Error fetching categories");
         }
     };
+    const getSubCategoryCallback = (response) => {
+        if (response.status === 200) {
+            const subcategory = response.data;
+            setSubCategoryData({
+                name: subcategory.name || "",
+                category: subcategory.category?.map(cat => cat.name).join(",") || "",
+            });
+        } else {
+            console.log("Failed to fetch subcategory details");
+        }
+    };
     const getSubCategoryById = () => {
         apiCall({
             method: "GET",
             url: `${API_URLS.SUB_CATEGORIES}/${subcategory_id}`,
             data: {},
             setLoading: setLoading,
-            callback: (response) => {
-                if (response.status === 200) {
-                    const subcategory = response.data;
-                    setSubCategoryData({
-                        name: subcategory.name || "",
-                        category: subcategory.category?.name || "",
-                    });
-                } else {
-                    console.log("Failed to fetch subcategory details");
-                }
-            }
+            callback: getSubCategoryCallback,
         });
     };
-
     const addSubCategoryCallback = (response) => {
-        if (response.status === 200) {
-            console.log("SubCategory added successfully");
-            setSubCategoryData({ name: "", category: ""});
+        if (response.status === 201) {
+            toast.success("SubCategory added successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
+            setSubCategoryData({ name: "", category: "" });
             navigate("/subcategories");
         } else {
-            console.log("Failed to add subcategory");
+            const errorMsg = response?.data?.error || "Failed to add subcategory";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
         }
     };
+
     const validateSubCategory = () => {
         const newErrors = {};
 
-        if (!subCategoryData.category.length) {
-            newErrors.category = "Please select at least one category";
+        if (!subCategoryData.category) {
+            newErrors.category = "Please select a category";
         }
-
         if (!subCategoryData.name.trim()) {
             newErrors.name = "Please enter subcategory name";
         }
@@ -91,21 +99,6 @@ function AddSubCategories() {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-
-    // const validateSubCategory = () => {
-    //     const newErrors = {};
-
-    //     // if (typeof subCategoryData.category !== "string" || !subCategoryData.category.trim()) {
-    //     //     newErrors.category = "Please select a category";
-    //     // }
-
-    //     if (!subCategoryData.name.trim()) {
-    //         newErrors.name = "Please enter subcategory name";
-    //     }
-
-    //     setErrors(newErrors);
-    //     return Object.keys(newErrors).length === 0;
-    // };
 
     const addSubCategory = () => {
         if (!validateSubCategory()) {
@@ -118,6 +111,24 @@ function AddSubCategories() {
             callback: addSubCategoryCallback,
         });
     };
+    const updateSubCategoryCallback = (response) => {
+        if (response.status === 200) {
+            toast.success("SubCategory updated successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
+            setTimeout(() => {
+                navigate("/subcategories");
+            }, 2000);
+        } else {
+            const errorMsg = response?.data?.error || "Failed to update subcategory";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
+        }
+    };
+
     const updateSubCategory = () => {
         if (!validateSubCategory()) return;
 
@@ -125,14 +136,7 @@ function AddSubCategories() {
             method: "PUT",
             url: `${API_URLS.SUB_CATEGORIES}/${subcategory_id}`,
             data: subCategoryData,
-            callback: (response) => {
-                if (response.status === 200) {
-                    console.log("SubCategory updated successfully");
-                    navigate("/subcategories");
-                } else {
-                    console.log("Failed to update subcategory");
-                }
-            }
+            callback: updateSubCategoryCallback,
         });
     };
     const handleSubmit = () => {
@@ -152,6 +156,18 @@ function AddSubCategories() {
                     {subcategory_id ? "Edit SubCategory" : "Add SubCategory"}
                 </h2>
                 <div className="mb-4">
+                    <InputComponents
+                        label="Add Subcategory"
+                        type="text"
+                        name="name"
+                        placeholder="SubCategory"
+                        value={subCategoryData.name}
+                        onChange={handleInputChange}
+                        inputClassName="w-[190px]"
+                        error={errors.name}
+                    />
+                </div>
+                <div className="mb-4">
                     <DropdownComponent
                         label="Add Category"
                         options={categoriesData}
@@ -162,18 +178,6 @@ function AddSubCategories() {
                         }}
                         dropdownClassName="w-[190px]"
                         error={errors.category}
-                    />
-                </div>
-                <div className="mb-4">
-                    <InputComponents
-                        label="Add Subcategory"
-                        type="text"
-                        name="name"
-                        placeholder="SubCategory"
-                        value={subCategoryData.name}
-                        onChange={handleInputChange}
-                        inputClassName="w-[190px]"
-                        error={errors.name}
                     />
                 </div>
                 <div>

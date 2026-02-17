@@ -21,25 +21,15 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          {/* <Route path="/add-template" element={<AddTemplate />} /> */}
-          {/* <Route path="/add-template/:templateId" element={<AddTemplate />} /> */}
           <Route path="/add-template/:template_id?" element={<AddTemplate />} />
           <Route path="/users" element={<UsersList />} />
           <Route path="/plans" element={<SubscriptionPlans />} />
-          {/* <Route path="/add-plan" element={<AddNewPlan />} /> */}
           <Route path="/add-plan/:plan_id?" element={<AddNewPlan />} />
           <Route path="/categories" element={<Categories />} />
-          {/* <Route path="/add-category" element={<AddCategories />} /> */}
           <Route path="/add-category/:category_id?" element={<AddCategories />} />
-
           <Route path="/subcategories" element={<SubCategories />} />
-          {/* <Route path="/add-subcategory" element={<AddSubCategories />} /> */}
           <Route path="/add-subcategory" element={<AddSubCategories />} />
           <Route path="/add-subcategory/:subcategory_id?" element={<AddSubCategories />} />
-
-
-
-
         </Routes>
       </Router>
     </div>

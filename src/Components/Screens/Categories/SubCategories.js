@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
@@ -24,7 +23,6 @@ function SubCategories() {
             callback: getCategoriesCallback,
         });
     };
-
     const getCategoriesCallback = (response) => {
         if (response.status === 200) {
             const categories = response.data.map(category => category.name);
@@ -36,10 +34,9 @@ function SubCategories() {
     const getSubCategoriesCallback = (response) => {
         if (response.status === 200) {
             const subcategories = response.data.map(subcategory => ({
-                // ...subcategory,
-                // category: subcategory.category?.name || "N/A",
                 Name: subcategory.name,
-                Category: subcategory.category?.name,
+                // Category: subcategory?.category?.name,
+                Category: subcategory.category.map(cat => cat.name).join(","),
                 Action: (
                     <div
                         className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 cursor-pointer"
@@ -82,7 +79,7 @@ function SubCategories() {
                     buttonClassName="py-1 px-3 text-sm font-bold mb-3"
                 />
                 <TableComponent
-                    headers={ SUB_CATEGORIES_COLUMNS}
+                    headers={SUB_CATEGORIES_COLUMNS}
                     data={subCategories}
                     maxHeight=" h-[84vh]"
 

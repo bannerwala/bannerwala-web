@@ -4,7 +4,6 @@ import CategoryCardComponent from "../../CustomComponents/CategoryCardComponent/
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
 import { useNavigate } from "react-router-dom";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
-import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
 import DropdownInputComponent from "../../CustomComponents/DropdownInputComponent/DropdownInputComponent";
 import { API_URLS } from "../../Utils/AppConst";
@@ -19,14 +18,6 @@ export default function Dashboard() {
     const [hasMore, setHasMore] = useState(true);
     const limit = 2;
     const navigate = useNavigate();
-    // useEffect(() => {
-    //     getTemplateData({ category: "", subcategory: "", offset: 0, isInitial: true });
-    // }, []);
-    // useEffect(() => {
-    //     if (hasMore && !loading) {
-    //         getTemplateData({ category, subcategory, offset, isInitial: false });
-    //     }
-    // }, [templates]);
     const fetchCategoriesCallback = (response) => {
         if (response.status === 200) {
             const categories = response.data.map(c => c.name);
@@ -66,21 +57,6 @@ export default function Dashboard() {
             callback: fetchCategoriesCallback
         });
     };
-
-    // const getSubcategoriesData = () => {
-    //     apiCall({
-    //         method: "GET",
-    //         url: "https://image-edit-backend.vercel.app/api/sub-categories",
-    //         callback: fetchSubcategoriesCallback
-    //     });
-    // };
-    // const getSubcategoriesData = (categoryName) => {
-    //     apiCall({
-    //         method: "GET",
-    //         url: `https://image-edit-backend.vercel.app/api/sub-categories?categoryName=${categoryName}`,
-    //         callback: fetchSubcategoriesCallback
-    //     });
-    // };
     const getSubcategoriesData = (categoryName = "") => {
         let url = API_URLS.SUB_CATEGORIES;
         if (categoryName) {
@@ -202,13 +178,6 @@ export default function Dashboard() {
                         />
                     </div>
                 </div>
-                {/* <div onScroll={handleScroll} className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto">
-                    {templates.map((cat, i) => (
-                        <div key={i} className="cursor-pointer">
-                            <CategoryCardComponent img={cat.url} />
-                        </div>
-                    ))}
-                </div> */}
                 <div onScroll={handleScroll} className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto">
                     {templates && templates.map((cat, i) => (
                         <div key={i} className="relative cursor-pointer group">

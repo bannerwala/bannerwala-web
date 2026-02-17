@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-function DropdownComponent({ label, options = [], value = [], onChange, dropdownClassName = "", error }) {
+function DropdownComponent({ label, options = [], value = "", onChange, dropdownClassName = "", error }) {
     const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
     const toggleDropdown = () => setIsOpen(!isOpen);
     const handleCheckboxChange = (option) => {
-        const selected = value ? value.split(", ") : [];
+        const selected = value ? value.split(",") : [];
         let newSelected = [];
 
         if (selected.includes(option)) {
@@ -13,21 +14,30 @@ function DropdownComponent({ label, options = [], value = [], onChange, dropdown
         } else {
             newSelected = [...selected, option];
         }
-
         onChange(newSelected.join(", "));
     };
 
-    const selected = value ? value.split(", ") : [];
+    const selected = value ? value.split(",") : [];
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     return (
-        <div className={`relative ${dropdownClassName}`}>
+        <div className={`relative ${dropdownClassName}`} ref={dropdownRef}>
             <label className="font-semibold mb-1 block">{label}</label>
             <div
                 className="mt-2 p-2 border border-gray-300 rounded bg-white cursor-pointer"
                 onClick={toggleDropdown}
             >
                 {value || `Select ${label}`}
-                {/* {value.length > 0 ? value.join(", ") : `Select ${label}`} */}
             </div>
 
             {isOpen && (
@@ -37,7 +47,6 @@ function DropdownComponent({ label, options = [], value = [], onChange, dropdown
                             <input
                                 type="checkbox"
                                 checked={selected.includes(option)}
-                                // checked={value.includes(option)}
                                 onChange={() => handleCheckboxChange(option)}
                                 className="mr-2"
                             />

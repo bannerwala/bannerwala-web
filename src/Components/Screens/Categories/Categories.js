@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import TableComponent from "../../CustomComponents/TableComponent/TableComponent";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
