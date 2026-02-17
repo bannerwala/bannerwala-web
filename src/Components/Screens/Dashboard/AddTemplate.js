@@ -14,10 +14,12 @@ function AddTemplate() {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [selectedSubcategory, setSelectedSubcategory] = useState("");
     const [selectedPlan, setSelectedPlan] = useState("");
-    const [templateFileBase64, setTemplateFileBase64] = useState("");
+    // const [templateFileBase64, setTemplateFileBase64] = useState("");
     const [categoriesData, setCategoriesData] = useState([]);
     const [subcategoryOptions, setSubcategoryOptions] = useState([]);
     const [loading, setLoading] = useState(false)
+    const [templateImage, setTemplateImage] = useState(null);
+    const [psdFile, setPsdFile] = useState(null);
     // const [fontFamily, setFontFamily] = useState("");
     // const [fontSize, setFontSize] = useState("");
     // const [fontColor, setFontColor] = useState("");
@@ -40,22 +42,32 @@ function AddTemplate() {
     //     color: ""
     // });
     const { template_id } = useParams();
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setTemplateFileBase64(reader.result);
-        };
-        reader.readAsDataURL(file);
-    };
+    // const handleFileChange = (e) => {
+    //     const file = e.target.files[0];
+    //     if (!file) return;
+    //     const reader = new FileReader();
+    //     reader.onloadend = () => {
+    //         setTemplateFileBase64(reader.result);
+    //     };
+    //     reader.readAsDataURL(file);
+    // };
     useEffect(() => {
         getCategoriesData();
         // getSubcategoriesData();
         getPlansData();
         if (template_id) getTemplateData();
     }, [template_id]);
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setTemplateImage(file);
+    };
 
+    const handlePsdChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setPsdFile(file);
+    };
 
     const getPlansData = () => {
         apiCall({
@@ -86,10 +98,15 @@ function AddTemplate() {
     }
     const validateTemplateData = () => {
         const newErrors = {};
-        if (!templateFileBase64) newErrors.template = "Template file is required";
+        // if (!templateFileBase64) newErrors.template = "Template file is required";
+        if (!templateImage && !template_id)
+            newErrors.image = "Template image is required";
+
+        if (!psdFile && !template_id)
+            newErrors.psd = "PSD file is required";
         if (!selectedPlan) newErrors.plan = "Plan is required";
         if (!selectedCategory) newErrors.category = "Category is required";
-        if (!selectedSubcategory) newErrors.subcategory = "Subcategory is required";
+        // if (!selectedSubcategory) newErrors.subcategory = "Subcategory is required";
         // if (!titleFont.family) newErrors.titleFamily = "Title font family is required";
         // if (!titleFont.size) newErrors.titleSize = "Title font size is required";
         // if (!titleFont.color) newErrors.titleColor = "Title font color is required";
@@ -102,27 +119,38 @@ function AddTemplate() {
 
     const addTemplateData = () => {
         if (!validateTemplateData()) return;
-        console.log("Submitting data:");
-        console.log("Plan:", selectedPlan);
-        console.log("Category:", selectedCategory);
-        console.log("Subcategory:", selectedSubcategory);
-        console.log("Template base64:", templateFileBase64);
-        const requestData = {
-            // plans: selectedPlan === "Paid",
-            plans: selectedPlan,
-            categories: selectedCategory || "",
-            sub_categories: selectedSubcategory || "",
-            url: templateFileBase64 || "",
-            // title_font: titleFont,
-            // description_font: descFont,
-            // footer_font: footerFont,
-            has_multiple_images: isMultiImageBanner
+        // console.log("Submitting data:");
+        // console.log("Plan:", selectedPlan);
+        // console.log("Category:", selectedCategory);
+        // console.log("Subcategory:", selectedSubcategory);
+        // console.log("Template base64:", templateFileBase64);
+        // const requestData = {
+        //     // plans: selectedPlan === "Paid",
+        //     plans: selectedPlan,
+        //     categories: selectedCategory || "",
+        //     sub_categories: selectedSubcategory || "",
+        //     url: templateFileBase64 || "",
+        //     // title_font: titleFont,
+        //     // description_font: descFont,
+        //     // footer_font: footerFont,
+        //     has_multiple_images: isMultiImageBanner
 
-        };
+        // };
+        const formData = new FormData();
+
+        formData.append("plans", selectedPlan);
+        formData.append("categories", selectedCategory || "");
+        formData.append("sub_categories", selectedSubcategory || "");
+        formData.append("has_multiple_images", isMultiImageBanner);
+
+        formData.append("image", templateImage);
+        formData.append("psd_file", psdFile);
+
         apiCall({
             method: "POST",
             url: API_URLS.TEMPLATES,
-            data: requestData,
+            // data: requestData,
+            data: formData,
             callback: addTemplatesCallback,
             setLoading: setLoading
         });
@@ -226,7 +254,7 @@ function AddTemplate() {
             setSelectedPlan(selectedPlans || "");
             setSelectedCategory(selectedCategories);
             setSelectedSubcategory(selectedSubcategories);
-            setTemplateFileBase64(templateData.url || "");
+            // setTemplateFileBase64(templateData.url || "");
             setIsMultiImageBanner(templateData.has_multiple_images || false);
         } else {
             const errorMsg = response?.data?.error || "Failed to fetch template data";
@@ -239,17 +267,32 @@ function AddTemplate() {
 
     const editTemplateData = () => {
         if (!validateTemplateData()) return;
-        const requestData = {
-            plans: selectedPlan,
-            categories: selectedCategory,
-            sub_categories: selectedSubcategory,
-            url: templateFileBase64,
-            has_multiple_images: isMultiImageBanner
-        };
+        // const requestData = {
+        //     plans: selectedPlan,
+        //     categories: selectedCategory,
+        //     sub_categories: selectedSubcategory,
+        //     url: templateFileBase64,
+        //     has_multiple_images: isMultiImageBanner
+        // };
+
+        const formData = new FormData();
+
+        formData.append("plans", selectedPlan);
+        formData.append("categories", selectedCategory);
+        formData.append("sub_categories", selectedSubcategory);
+        formData.append("has_multiple_images", isMultiImageBanner);
+
+        if (templateImage)
+            formData.append("image", templateImage);
+
+        if (psdFile)
+            formData.append("psd_file", psdFile);
+
         apiCall({
             method: "PUT",
             url: `${API_URLS.TEMPLATES}/${template_id}`,
-            data: requestData,
+            // data: requestData,
+            data: formData,
             callback: editTemplateCallback,
             setLoading
         });
@@ -286,7 +329,7 @@ function AddTemplate() {
                     <h2 className="text-xl font-serif mb-4">{template_id ? "Edit Template" : "Add Template"}</h2>
                     <div className="grid grid-cols-2 gap-x-5 gap-y-4">
                         <div className="flex flex-col">
-                            <label className="font-serif font-bold mb-1">Template File</label>
+                            {/* <label className="font-serif font-bold mb-1">Template File</label>
                             <input
                                 type="file"
                                 name="template"
@@ -298,6 +341,35 @@ function AddTemplate() {
                             />
                             {errors.template && (
                                 <span className="text-red-500 text-sm">{errors.template}</span>
+                            )} */}
+
+                            <div className="flex flex-col">
+                                <label className="font-serif font-bold mb-1">PSD File</label>
+                                <input
+                                    type="file"
+                                    accept=".psd"
+                                    onChange={(e) => {
+                                        handlePsdChange(e);
+                                        setErrors(prev => ({ ...prev, psd: "" }));
+                                    }}
+                                    className="border p-2 rounded w-[80%]"
+                                />
+                                {errors.psd && (
+                                    <span className="text-red-500 text-sm">{errors.psd}</span>
+                                )}
+                            </div>
+                            <label className="font-serif font-bold mb-1">Template Image</label>
+                            <input
+                                type="file"
+                                accept="image/png,image/jpeg,image/jpg"
+                                onChange={(e) => {
+                                    handleImageChange(e);
+                                    setErrors(prev => ({ ...prev, image: "" }));
+                                }}
+                                className="border p-2 rounded w-[80%]"
+                            />
+                            {errors.image && (
+                                <span className="text-red-500 text-sm">{errors.image}</span>
                             )}
                         </div>
                         <DropdownComponent

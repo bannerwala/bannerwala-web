@@ -71,7 +71,7 @@ function AddSubCategories() {
     const addSubCategoryCallback = (response) => {
         if (response.status === 200) {
             console.log("SubCategory added successfully");
-            setSubCategoryData({ name: "", category: "" });
+            setSubCategoryData({ name: "", category: ""});
             navigate("/subcategories");
         } else {
             console.log("Failed to add subcategory");
@@ -80,9 +80,9 @@ function AddSubCategories() {
     const validateSubCategory = () => {
         const newErrors = {};
 
-        // if (typeof subCategoryData.category !== "string" || !subCategoryData.category.trim()) {
-        //     newErrors.category = "Please select a category";
-        // }
+        if (!subCategoryData.category.length) {
+            newErrors.category = "Please select at least one category";
+        }
 
         if (!subCategoryData.name.trim()) {
             newErrors.name = "Please enter subcategory name";
@@ -91,6 +91,21 @@ function AddSubCategories() {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+
+    // const validateSubCategory = () => {
+    //     const newErrors = {};
+
+    //     // if (typeof subCategoryData.category !== "string" || !subCategoryData.category.trim()) {
+    //     //     newErrors.category = "Please select a category";
+    //     // }
+
+    //     if (!subCategoryData.name.trim()) {
+    //         newErrors.name = "Please enter subcategory name";
+    //     }
+
+    //     setErrors(newErrors);
+    //     return Object.keys(newErrors).length === 0;
+    // };
 
     const addSubCategory = () => {
         if (!validateSubCategory()) {
@@ -146,7 +161,7 @@ function AddSubCategories() {
                             setErrors(errors => ({ ...errors, category: "" }));
                         }}
                         dropdownClassName="w-[190px]"
-                    // error={errors.category}
+                        error={errors.category}
                     />
                 </div>
                 <div className="mb-4">

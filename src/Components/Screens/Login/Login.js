@@ -5,7 +5,7 @@ import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { API_URLS } from "../../Utils/AppConst";
-
+import BannerBackground from "../../../Assets/Bannerbackground.png";
 function Login() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
@@ -141,14 +141,19 @@ function Login() {
     return (
         <div
             className="h-screen w-screen bg-cover bg-center flex items-center justify-center"
-            style={{
-                backgroundImage:
-                    "url('https://cdn.vectorstock.com/i/500p/45/63/wave-green-background-abstract-modern-vector-48874563.jpg')",
-            }}
+            style={{ backgroundImage: `url(${BannerBackground})` }}
+        // style={{
+        //     backgroundImage:
+        //         "url('https://cdn.vectorstock.com/i/500p/45/63/wave-green-background-abstract-modern-vector-48874563.jpg')",
+        // }}
+
         >
-            <div className="bg-white  p-10 rounded-xl shadow-2xl w-full max-w-lg mx-4">
+            <div className="bg-black h-[100%] w-[100%] absolute top-0 opacity-[0.5]"></div>
+
+            <div className="bg-white/24 rounded-[16px] shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-[8.7px] border border-white/22 p-10  w-full max-w-lg mx-4 relative">
                 {loading && <Spinner />}
-                <div className="text-3xl font-bold text-black text-center mb-8">
+
+                <div className="text-3xl font-bold text-white text-center mb-8">
                     Welcome To Image Editor
                 </div>
 
@@ -215,23 +220,25 @@ function Login() {
                         </div>
                     </>
                 )}
-                {!otpSent ? (
-                    <PrimaryButtonComponent
-                        // label={loading ? "Sending OTP..." : "Send OTP"}
-                        label="Send OTP"
-                        onClick={handleSendOtp}
-                        // buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-200"
-                        buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
-                    />
-                ) : (
-                    <PrimaryButtonComponent
-                        // label={loading ? "Logging in..." : "Log In"}
-                        label="Verify & Login"
-                        onClick={handleLoginClick}
-                        // buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-serif font-bold rounded-lg hover:bg-blue-700 transition duration-200"
-                        buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
-                    />
-                )}
+                <div className="flex justify-center">
+                    {!otpSent ? (
+                        <PrimaryButtonComponent
+                            // label={loading ? "Sending OTP..." : "Send OTP"}
+                            label="Send OTP"
+                            onClick={handleSendOtp}
+                            // buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-200"
+                            buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg"
+                        />
+                    ) : (
+                        <PrimaryButtonComponent
+                            // label={loading ? "Logging in..." : "Log In"}
+                            label="Verify & Login"
+                            onClick={handleLoginClick}
+                            // buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-serif font-bold rounded-lg hover:bg-blue-700 transition duration-200"
+                            buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg"
+                        />
+                    )}
+                </div>
             </div>
         </div >
     );

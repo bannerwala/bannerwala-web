@@ -1,21 +1,22 @@
 import { useState } from "react";
 
-function DropdownComponent({ label, options = [], value = "", onChange, dropdownClassName = "", error }) {
+function DropdownComponent({ label, options = [], value = [], onChange, dropdownClassName = "", error }) {
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleDropdown = () => setIsOpen(!isOpen);
-
     const handleCheckboxChange = (option) => {
-        const values = value ? value.split(", ") : [];
-        if (values.includes(option)) {
-            const newValue = values.filter((v) => v !== option).join(", ");
-            onChange(newValue);
+        const selected = value ? value.split(", ") : [];
+        let newSelected = [];
+
+        if (selected.includes(option)) {
+            newSelected = selected.filter(v => v !== option);
         } else {
-            const newValue = [...values, option].join(", ");
-            onChange(newValue);
+            newSelected = [...selected, option];
         }
-        setIsOpen(false);
+
+        onChange(newSelected.join(", "));
     };
+
     const selected = value ? value.split(", ") : [];
 
     return (
@@ -26,6 +27,7 @@ function DropdownComponent({ label, options = [], value = "", onChange, dropdown
                 onClick={toggleDropdown}
             >
                 {value || `Select ${label}`}
+                {/* {value.length > 0 ? value.join(", ") : `Select ${label}`} */}
             </div>
 
             {isOpen && (
@@ -35,6 +37,7 @@ function DropdownComponent({ label, options = [], value = "", onChange, dropdown
                             <input
                                 type="checkbox"
                                 checked={selected.includes(option)}
+                                // checked={value.includes(option)}
                                 onChange={() => handleCheckboxChange(option)}
                                 className="mr-2"
                             />
