@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { API_URLS } from "../../Utils/AppConst";
 import BannerBackground from "../../../Assets/Bannerbackground.png";
+import LogoImage from "../../../Assets/logo.jpg.jpeg";
+
 function Login() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
@@ -14,7 +16,6 @@ function Login() {
     const [otpTimer, setOtpTimer] = useState(0);
     const [loginFormData, setLoginFormData] = useState({
         contact_number: "",
-        // password: ""
         otp: ""
     });
     useEffect(() => {
@@ -51,12 +52,19 @@ function Login() {
     const sendOtpCallback = (response) => {
         setLoading(false);
         if (response.status === 200) {
-            toast.success("OTP sent successfully!", { position: "top-center" });
+            toast.success("OTP sent successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
             setOtpSent(true);
             setOtpTimer(60);
             setLoginFormData(prev => ({ ...prev, otp: "" }));
         } else {
-            toast.error(response?.data?.error || "Failed to send OTP", { position: "top-center", autoClose: 2000 });
+            const errorMsg = response?.data?.error || "Failed to send OTP";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
         }
     };
     const handleSendOtp = () => {
@@ -64,7 +72,6 @@ function Login() {
         setLoading(true);
         apiCall({
             method: "POST",
-            // url: "https://bannerwala-backend.onrender.com/api/users/send",
             url: API_URLS.SEND_OTP,
             data: { contact_number: loginFormData.contact_number },
             callback: sendOtpCallback,
@@ -88,7 +95,10 @@ function Login() {
             // localStorage.setItem("loggedinPhoneNumber", loginFormData.contact_number);
             localStorage.setItem('loggedInUser', JSON.stringify(response.data.user));
             localStorage.setItem('token', response.data.token);
-            toast.success("Logged in successfully!", { position: "top-center" });
+            toast.success("Logged in successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
             navigate("/dashboard");
         } else {
             const errorMsg = response?.data?.error || "Login failed. Please check your credentials.";
@@ -103,58 +113,25 @@ function Login() {
         setLoading(true);
         apiCall({
             method: "POST",
-            // url: "https://bannerwala-backend.onrender.com/api/users/login",
             url: API_URLS.LOGIN,
             data: loginFormData,
             callback: loginCallback,
             setLoading
         });
     };
-    // const validateLogin = () => {
-    //     const newErrors = {};
-    //     if (!loginFormData.contact_number.trim()) {
-    //         newErrors.contact_number = "Please Enter Contact Number";
-    //     } else if (loginFormData.contact_number.length !== 10) {
-    //         newErrors.contact_number = "Contact number must be 10 digits";
-    //     }
-
-    //     if (!loginFormData.password.trim()) {
-    //         newErrors.password = "Please Enter Password";
-    //     }
-    //     setErrors(newErrors);
-    // };
-
-    // const handleLoginClick = () => {
-    //     validateLogin();
-    //     if (!loginFormData.contact_number.trim() || loginFormData.contact_number.length !== 10 || !loginFormData.password.trim()) {
-    //         return;
-
-    //     }
-    //     apiCall({
-    //         method: "POST",
-    //         url: "https://image-edit-backend.vercel.app/api/users/login",
-    //         data: loginFormData,
-    //         callback: loginCallback,
-    //         setLoading: setLoading
-    //     });
-    // };
     return (
         <div
             className="h-screen w-screen bg-cover bg-center flex items-center justify-center"
             style={{ backgroundImage: `url(${BannerBackground})` }}
-        // style={{
-        //     backgroundImage:
-        //         "url('https://cdn.vectorstock.com/i/500p/45/63/wave-green-background-abstract-modern-vector-48874563.jpg')",
-        // }}
-
         >
-            <div className="bg-black h-[100%] w-[100%] absolute top-0 opacity-[0.5]"></div>
-
-            <div className="bg-white/24 rounded-[16px] shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-[8.7px] border border-white/22 p-10  w-full max-w-lg mx-4 relative">
+            <div className="bg-white p-10 rounded-xl shadow-2xl w-full max-w-lg mx-4 relative">
                 {loading && <Spinner />}
+                <div className="flex justify-center mb-4">
+                    <img src={LogoImage} alt="Logo" className="w-58 h-64 object-contain" />
+                </div>
 
-                <div className="text-3xl font-bold text-white text-center mb-8">
-                    Welcome To Image Editor
+                <div className="text-3xl font-bold text-black text-center mb-8">
+                    Welcome To BannerWala
                 </div>
 
                 <InputComponents
@@ -164,7 +141,6 @@ function Login() {
                     inputClassName="w-full mb-4"
                     error={errors.contact_number}
                     value={loginFormData.contact_number}
-                    // error={errors.contact_number}
                     onChange={(e) => {
                         const input = e.target.value.replace(/\D/g, '');
                         if (input.length <= 10) {
@@ -174,15 +150,6 @@ function Login() {
                     }}
                     maxLength={10}
                 />
-                {/* <InputComponents
-                    type="text"
-                    name="password"
-                    placeholder="Password"
-                    inputClassName="w-full mt-4 mb-4"
-                    value={loginFormData.password}
-                    error={errors.password}
-                    onChange={handleInputChange}
-                /> */}
                 {otpSent && (
                     <>
                         <InputComponents
@@ -223,18 +190,14 @@ function Login() {
                 <div className="flex justify-center">
                     {!otpSent ? (
                         <PrimaryButtonComponent
-                            // label={loading ? "Sending OTP..." : "Send OTP"}
                             label="Send OTP"
                             onClick={handleSendOtp}
-                            // buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-200"
                             buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg"
                         />
                     ) : (
                         <PrimaryButtonComponent
-                            // label={loading ? "Logging in..." : "Log In"}
                             label="Verify & Login"
                             onClick={handleLoginClick}
-                            // buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-serif font-bold rounded-lg hover:bg-blue-700 transition duration-200"
                             buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg"
                         />
                     )}
