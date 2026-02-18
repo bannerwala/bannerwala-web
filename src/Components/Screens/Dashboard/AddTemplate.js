@@ -18,7 +18,7 @@ function AddTemplate() {
     const [categoriesData, setCategoriesData] = useState([]);
     const [subcategoryOptions, setSubcategoryOptions] = useState([]);
     const [loading, setLoading] = useState(false)
-    const [templateImage, setTemplateImage] = useState(null);
+    // const [templateImage, setTemplateImage] = useState(null);
     const [psdFile, setPsdFile] = useState(null);
     // const [fontFamily, setFontFamily] = useState("");
     // const [fontSize, setFontSize] = useState("");
@@ -57,11 +57,11 @@ function AddTemplate() {
         getPlansData();
         if (template_id) getTemplateData();
     }, [template_id]);
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        setTemplateImage(file);
-    };
+    // const handleImageChange = (e) => {
+    //     const file = e.target.files[0];
+    //     if (!file) return;
+    //     setTemplateImage(file);
+    // };
 
     const handlePsdChange = (e) => {
         const file = e.target.files[0];
@@ -99,8 +99,8 @@ function AddTemplate() {
     const validateTemplateData = () => {
         const newErrors = {};
         // if (!templateFileBase64) newErrors.template = "Template file is required";
-        if (!templateImage && !template_id)
-            newErrors.image = "Template image is required";
+        // if (!templateImage && !template_id)
+        //     newErrors.image = "Template image is required";
 
         if (!psdFile && !template_id)
             newErrors.psd = "PSD file is required";
@@ -143,7 +143,7 @@ function AddTemplate() {
         formData.append("sub_categories", selectedSubcategory || "");
         formData.append("has_multiple_images", isMultiImageBanner);
 
-        formData.append("image", templateImage);
+        // formData.append("image", templateImage);
         formData.append("psd_file", psdFile);
 
         apiCall({
@@ -226,23 +226,6 @@ function AddTemplate() {
             setLoading
         });
     };
-    // const getTemplateDataCallback = (response) => {
-    //     if (response.status === 200) {
-    //         const templateData = response.data;
-
-    //         setSelectedPlan(templateData.plans || "");
-    //         setSelectedCategory(templateData.categories || "").join(",");
-    //         setSelectedSubcategory(templateData.sub_categories || "");
-    //         setTemplateFileBase64(templateData.url || "");
-    //         setIsMultiImageBanner(templateData.has_multiple_images || false);
-    //     } else {
-    //         const errorMsg = response?.data?.error || "Failed to fetch template data";
-    //         toast.error(errorMsg, {
-    //             position: "top-center",
-    //             autoClose: 2000,
-    //         });
-    //     }
-    // };
     const getTemplateDataCallback = (response) => {
         if (response.status === 200) {
             const templateData = response.data;
@@ -282,8 +265,8 @@ function AddTemplate() {
         formData.append("sub_categories", selectedSubcategory);
         formData.append("has_multiple_images", isMultiImageBanner);
 
-        if (templateImage)
-            formData.append("image", templateImage);
+        // if (templateImage)
+        //     formData.append("image", templateImage);
 
         if (psdFile)
             formData.append("psd_file", psdFile);
@@ -358,7 +341,7 @@ function AddTemplate() {
                                     <span className="text-red-500 text-sm">{errors.psd}</span>
                                 )}
                             </div>
-                            <label className="font-serif font-bold mb-1">Template Image</label>
+                            {/* <label className="font-serif font-bold mb-1">Template Image</label>
                             <input
                                 type="file"
                                 accept="image/png,image/jpeg,image/jpg"
@@ -370,7 +353,7 @@ function AddTemplate() {
                             />
                             {errors.image && (
                                 <span className="text-red-500 text-sm">{errors.image}</span>
-                            )}
+                            )} */}
                         </div>
                         <DropdownComponent
                             label="Plan"
