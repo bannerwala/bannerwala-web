@@ -106,7 +106,7 @@ function AddTemplate() {
             newErrors.psd = "PSD file is required";
         if (!selectedPlan) newErrors.plan = "Plan is required";
         if (!selectedCategory) newErrors.category = "Category is required";
-        // if (!selectedSubcategory) newErrors.subcategory = "Subcategory is required";
+        if (!selectedSubcategory) newErrors.subcategory = "Subcategory is required";
         // if (!titleFont.family) newErrors.titleFamily = "Title font family is required";
         // if (!titleFont.size) newErrors.titleSize = "Title font size is required";
         // if (!titleFont.color) newErrors.titleColor = "Title font color is required";

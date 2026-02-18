@@ -124,21 +124,22 @@ function Login() {
             className="h-screen w-screen bg-cover bg-center flex items-center justify-center"
             style={{ backgroundImage: `url(${BannerBackground})` }}
         >
-            <div className="bg-white p-10 rounded-xl shadow-2xl w-full max-w-lg mx-4 relative">
+            <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg mx-4 relative">
                 {loading && <Spinner />}
-                <div className="flex justify-center mb-4">
+                <div className="flex justify-center mb-4 ">
                     <img src={LogoImage} alt="Logo" className="w-58 h-64 object-contain" />
                 </div>
 
-                <div className="text-3xl font-bold text-black text-center mb-8">
-                    Welcome To BannerWala
+                <div className="text-3xl font-bold text-black mb-12 text-center ">
+                    {/* Welcome To BannerWala */}
+                    Login
                 </div>
 
                 <InputComponents
                     type="text"
                     name="contact_number"
                     placeholder="Mobile No"
-                    inputClassName="w-full mb-4"
+                    inputClassName="w-full mb-12"
                     error={errors.contact_number}
                     value={loginFormData.contact_number}
                     onChange={(e) => {
@@ -160,7 +161,7 @@ function Login() {
                             onChange={handleInputChange}
                             maxLength={6}
                             error={errors.otp}
-                            inputClassName="w-full mb-2"
+                            inputClassName="w-full mb-4"
                         />
                         <div className="text-sm text-gray-600 mb-4">
                             {otpTimer > 0 ? (
