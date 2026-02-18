@@ -6,7 +6,7 @@ function DropdownComponent({ label, options = [], value = "", onChange, dropdown
 
     const toggleDropdown = () => setIsOpen(!isOpen);
     const handleCheckboxChange = (option) => {
-        const selected = value ? value.split(",") : [];
+        const selected = value ? value.split(",").map(v => v.trim()) : [];
         let newSelected = [];
 
         if (selected.includes(option)) {
@@ -17,7 +17,7 @@ function DropdownComponent({ label, options = [], value = "", onChange, dropdown
         onChange(newSelected.join(", "));
     };
 
-    const selected = value ? value.split(",") : [];
+    const selected = value ? value.split(",").map(v => v.trim()) : [];
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
