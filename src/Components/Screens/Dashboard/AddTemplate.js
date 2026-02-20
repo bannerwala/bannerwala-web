@@ -14,7 +14,7 @@ function AddTemplate() {
     const [selectedCategory, setSelectedCategory] = useState([]);
     const [subcategoryOptions, setSubcategoryOptions] = useState([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState([]);
-    const [selectedPlan, setSelectedPlan] = useState("");
+    const [selectedPlan, setSelectedPlan] = useState([]);
     // const [templateFileBase64, setTemplateFileBase64] = useState("");
     const [categoriesData, setCategoriesData] = useState([]);
     // const [subcategoryOptions, setSubcategoryOptions] = useState([]);
@@ -27,6 +27,7 @@ function AddTemplate() {
     const [planOptions, setPlanOptions] = useState([]);
     const [errors, setErrors] = useState({});
     const [isMultiImageBanner, setIsMultiImageBanner] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
     // const [titleFont, setTitleFont] = useState({
     //     family: "",
     //     size: "",
@@ -68,6 +69,7 @@ function AddTemplate() {
         const file = e.target.files[0];
         if (!file) return;
         setPsdFile(file);
+        // setErrors(prev => ({ ...prev, psd: "" }));
     };
 
     const getPlansData = () => {
@@ -90,7 +92,7 @@ function AddTemplate() {
 
     const addTemplatesCallback = (response) => {
         console.log('response: ', response);
-        if (response.status === 200) {
+        if (response.status === 201) {
             toast.success("Template added successfully!", {
                 position: "top-center",
                 autoClose: 2000,
@@ -105,12 +107,16 @@ function AddTemplate() {
         // if (!templateFileBase64) newErrors.template = "Template file is required";
         // if (!templateImage && !template_id)
         //     newErrors.image = "Template image is required";
-
+        // if (!selectedPlan) newErrors.plan = "Plan is required";
         if (!psdFile && !template_id)
             newErrors.psd = "PSD file is required";
-        // if (!selectedPlan) newErrors.plan = "Plan is required";
-        if (!selectedCategory) newErrors.category = "Category is required";
-        if (!selectedSubcategory) newErrors.subcategory = "Subcategory is required";
+
+        if (!selectedCategory || selectedCategory.length === 0)
+            newErrors.category = "Category is required";
+
+        // Only validate subcategory if at least one category is selected
+        if (selectedCategory.length > 0 && (!selectedSubcategory || selectedSubcategory.length === 0))
+            newErrors.subcategory = "Subcategory is required";
         // if (!titleFont.family) newErrors.titleFamily = "Title font family is required";
         // if (!titleFont.size) newErrors.titleSize = "Title font size is required";
         // if (!titleFont.color) newErrors.titleColor = "Title font color is required";
@@ -168,17 +174,17 @@ function AddTemplate() {
                 getSubcategoriesData(categoryName, true);
             }
         });
-        const removedCategories = subcategoryOptions
-            .map(sub => sub.category)
-            .filter(cat => !updatedCategories.includes(cat));
-
-        if (removedCategories.length > 0) {
-            setSubcategoryOptions(prev =>
-                prev.filter(sub => !removedCategories.includes(sub.category))
-            );
-        }
-
-        setErrors(prev => ({ ...prev, category: "" }));
+        setSubcategoryOptions(prev =>
+            prev.filter(sub => updatedCategories.includes(sub.category))
+        );
+        setSelectedSubcategory(prev =>
+            prev.filter(subName =>
+                updatedCategories.some(cat =>
+                    subcategoryOptions.find(sub => sub.name === subName && sub.category === cat)
+                )
+            )
+        );
+        setErrors(prev => ({ ...prev, category: "", subcategory: "" }));
     };
     const getSubcategoriesCallback = (response, categoryName, merge = false) => {
         if (response.status === 200) {
@@ -186,9 +192,11 @@ function AddTemplate() {
                 name: sub.name,
                 category: categoryName
             }));
-
             if (merge) {
-                setSubcategoryOptions(prev => [...prev, ...subcategories]);
+                setSubcategoryOptions(prev => [
+                    ...prev,
+                    ...subcategories.filter(sub => !prev.some(p => p.name === sub.name))
+                ]);
             } else {
                 setSubcategoryOptions(subcategories);
             }
@@ -215,46 +223,22 @@ function AddTemplate() {
             setLoading
         });
     };
-    // const getTemplateDataCallback = (response) => {
-    //     if (response.status === 200) {
-    //         const templateData = response.data;
-    //         const selectedCategories = templateData.categories.map(category => category.name);
-    //         const selectedSubcategories = templateData.sub_categories.map(subcategory => subcategory.name);
-    //         const selectedPlans = templateData.plans.map(plan => plan.name);
-
-
-    //         setSelectedPlan(selectedPlans || "");
-    //         setSelectedCategory(selectedCategories);
-    //         setSelectedSubcategory(selectedSubcategories);
-    //         console.log('selectedSubcategories: ', selectedSubcategories);
-    //         // setTemplateFileBase64(templateData.url || "");
-    //         setIsMultiImageBanner(templateData.has_multiple_images || false);
-    //     } else {
-    //         const errorMsg = response?.data?.error || "Failed to fetch template data";
-    //         toast.error(errorMsg, {
-    //             position: "top-center",
-    //             autoClose: 2000,
-    //         });
-    //     }
-    // };
     const getTemplateDataCallback = (response) => {
         if (response.status === 200) {
-            const templateData = response.data;
+            const templateData = response.data.data;
 
             const selectedCategories = templateData.categories.map(c => c.name);
             const selectedSubcategories = templateData.sub_categories.map(s => s.name);
             const selectedPlans = templateData.plans.map(p => p.name);
-
-            setSelectedPlan(selectedPlans[0] || "");
+            setSelectedPlan(selectedPlans);
             setSelectedCategory(selectedCategories);
-
-            // Fetch subcategories for template categories
             selectedCategories.forEach(cat => {
-                getSubcategoriesData(cat, true); // merge = true
+                getSubcategoriesData(cat, true);
             });
 
             setSelectedSubcategory(selectedSubcategories);
             setIsMultiImageBanner(templateData.has_multiple_images || false);
+            setPreviewImage(templateData.url);
         } else {
             const errorMsg = response?.data?.error || "Failed to fetch template data";
             toast.error(errorMsg, { position: "top-center", autoClose: 2000 });
@@ -263,11 +247,18 @@ function AddTemplate() {
 
     const editTemplateData = () => {
         if (!validateTemplateData()) return;
+        const requestData = {
+            plans: selectedPlan.join(","),
+            categories: selectedCategory.join(","),
+            sub_categories: selectedSubcategory.join(","),
+            has_multiple_images: isMultiImageBanner
+        };
+
+
         apiCall({
             method: "PUT",
             url: `${API_URLS.TEMPLATES}/${template_id}`,
-            // data: requestData,
-            // data: formData,
+            data: requestData,
             callback: editTemplateCallback,
             setLoading
         });
@@ -317,20 +308,36 @@ function AddTemplate() {
                             {errors.template && (
                                 <span className="text-red-500 text-sm">{errors.template}</span>
                             )} */}
-
                             <div className="flex flex-col">
-                                <label className="font-serif font-bold mb-1">PSD File</label>
-                                <input
-                                    type="file"
-                                    accept=".psd"
-                                    onChange={(e) => {
-                                        handlePsdChange(e);
-                                        setErrors(prev => ({ ...prev, psd: "" }));
-                                    }}
-                                    className="border p-2 rounded w-[80%]"
-                                />
-                                {errors.psd && (
-                                    <span className="text-red-500 text-sm">{errors.psd}</span>
+                                {template_id ? (
+                                    <>
+                                        <label className="font-serif font-bold mb-1">PSD Preview</label>
+                                        {previewImage ? (
+                                            <img
+                                                src={previewImage}
+                                                alt="Template Preview"
+                                                className="w-32 h-auto border rounded shadow-md mt-2"
+                                            />
+                                        ) : (
+                                            <span className="text-gray-500">No PSD available</span>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <label className="font-serif font-bold mb-1">PSD File</label>
+                                        <input
+                                            type="file"
+                                            accept=".psd"
+                                            onChange={(e) => {
+                                                handlePsdChange(e);
+                                                setErrors(prev => ({ ...prev, psd: "" }));
+                                            }}
+                                            className="border p-2 rounded w-[80%]"
+                                        />
+                                        {errors.psd && (
+                                            <span className="text-red-500 text-sm">{errors.psd}</span>
+                                        )}
+                                    </>
                                 )}
                             </div>
                             {/* <label className="font-serif font-bold mb-1">Template Image</label>
@@ -357,6 +364,8 @@ function AddTemplate() {
                             }}
                             dropdownClassName="w-[80%]"
                             labelClassName="font-serif font-bold"
+                            isArray={true}
+
 
                         // error={errors.plan}
                         />
@@ -375,7 +384,11 @@ function AddTemplate() {
                             label="Subcategory"
                             options={subcategoryOptions.map(sub => sub.name)}
                             value={selectedSubcategory}
-                            onChange={setSelectedSubcategory}
+                            // onChange={setSelectedSubcategory}
+                            onChange={(value) => {
+                                setSelectedSubcategory(value);
+                                setErrors(prev => ({ ...prev, subcategory: "" }));
+                            }}
                             dropdownClassName="w-[80%]"
                             error={errors.subcategory}
                             disabled={!selectedCategory.length}
