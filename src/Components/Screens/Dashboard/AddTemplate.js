@@ -26,7 +26,8 @@ function AddTemplate() {
     // const [fontColor, setFontColor] = useState("");
     const [planOptions, setPlanOptions] = useState([]);
     const [errors, setErrors] = useState({});
-    const [isMultiImageBanner, setIsMultiImageBanner] = useState(false);
+    // const [isMultiImageBanner, setIsMultiImageBanner] = useState(false);
+    const [hasBannerFooter, setHasBannerFooter] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
     // const [titleFont, setTitleFont] = useState({
     //     family: "",
@@ -134,7 +135,8 @@ function AddTemplate() {
         formData.append("plans", selectedPlan);
         formData.append("categories", selectedCategory || "");
         formData.append("sub_categories", selectedSubcategory || "");
-        formData.append("has_multiple_images", isMultiImageBanner);
+        // formData.append("has_multiple_images", isMultiImageBanner);
+        formData.append("has_banner_footer", hasBannerFooter);
 
         // formData.append("image", templateImage);
         formData.append("psd_file", psdFile);
@@ -237,7 +239,9 @@ function AddTemplate() {
             });
 
             setSelectedSubcategory(selectedSubcategories);
-            setIsMultiImageBanner(templateData.has_multiple_images || false);
+            // setIsMultiImageBanner(templateData.has_multiple_images || false);
+            setHasBannerFooter(templateData.has_banner_footer || false);
+
             setPreviewImage(templateData.url);
         } else {
             const errorMsg = response?.data?.error || "Failed to fetch template data";
@@ -248,10 +252,10 @@ function AddTemplate() {
     const editTemplateData = () => {
         if (!validateTemplateData()) return;
         const requestData = {
-            plans: selectedPlan.join(","),
+            // plans: selectedPlan.join(","),
             categories: selectedCategory.join(","),
             sub_categories: selectedSubcategory.join(","),
-            has_multiple_images: isMultiImageBanner
+            has_banner_footer: hasBannerFooter
         };
 
 
@@ -399,10 +403,10 @@ function AddTemplate() {
                         <div className="flex items-center gap-2 mt-4">
                             <input
                                 type="checkbox"
-                                checked={isMultiImageBanner}
-                                onChange={(e) => setIsMultiImageBanner(e.target.checked)}
+                                checked={hasBannerFooter}
+                                onChange={(e) => setHasBannerFooter(e.target.checked)}
                             />
-                            <label className="font-serif font-bold">Multi-Image Template</label>
+                            <label className="font-serif font-bold">Has Banner Footer</label>
                         </div>
                         {/* <div className="col-span-2">
                             <div className="font-serif font-bold mb-2">Title</div>
