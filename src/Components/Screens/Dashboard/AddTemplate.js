@@ -11,12 +11,13 @@ import { toast } from "react-toastify";
 import { API_URLS } from "../../Utils/AppConst";
 function AddTemplate() {
     const navigate = useNavigate();
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [selectedSubcategory, setSelectedSubcategory] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState([]);
+    const [subcategoryOptions, setSubcategoryOptions] = useState([]);
+    const [selectedSubcategory, setSelectedSubcategory] = useState([]);
     const [selectedPlan, setSelectedPlan] = useState("");
     // const [templateFileBase64, setTemplateFileBase64] = useState("");
     const [categoriesData, setCategoriesData] = useState([]);
-    const [subcategoryOptions, setSubcategoryOptions] = useState([]);
+    // const [subcategoryOptions, setSubcategoryOptions] = useState([]);
     const [loading, setLoading] = useState(false)
     // const [templateImage, setTemplateImage] = useState(null);
     const [psdFile, setPsdFile] = useState(null);
@@ -90,8 +91,11 @@ function AddTemplate() {
     const addTemplatesCallback = (response) => {
         console.log('response: ', response);
         if (response.status === 200) {
-            console.log("Template added successfully!");
-            navigate("/dashboard")
+            toast.success("Template added successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
+            navigate("/dashboard");
         } else {
             console.log("Failed to add template.");
         };
@@ -104,7 +108,7 @@ function AddTemplate() {
 
         if (!psdFile && !template_id)
             newErrors.psd = "PSD file is required";
-        if (!selectedPlan) newErrors.plan = "Plan is required";
+        // if (!selectedPlan) newErrors.plan = "Plan is required";
         if (!selectedCategory) newErrors.category = "Category is required";
         if (!selectedSubcategory) newErrors.subcategory = "Subcategory is required";
         // if (!titleFont.family) newErrors.titleFamily = "Title font family is required";
@@ -119,23 +123,6 @@ function AddTemplate() {
 
     const addTemplateData = () => {
         if (!validateTemplateData()) return;
-        // console.log("Submitting data:");
-        // console.log("Plan:", selectedPlan);
-        // console.log("Category:", selectedCategory);
-        // console.log("Subcategory:", selectedSubcategory);
-        // console.log("Template base64:", templateFileBase64);
-        // const requestData = {
-        //     // plans: selectedPlan === "Paid",
-        //     plans: selectedPlan,
-        //     categories: selectedCategory || "",
-        //     sub_categories: selectedSubcategory || "",
-        //     url: templateFileBase64 || "",
-        //     // title_font: titleFont,
-        //     // description_font: descFont,
-        //     // footer_font: footerFont,
-        //     has_multiple_images: isMultiImageBanner
-
-        // };
         const formData = new FormData();
 
         formData.append("plans", selectedPlan);
@@ -174,48 +161,50 @@ function AddTemplate() {
             console.log("Error fetching categories");
         }
     };
-    // const getSubcategoriesData = () => {
-    //     let url = "https://image-edit-backend.vercel.app/api/sub-categories";
-    //     apiCall({
-    //         method: 'GET',
-    //         url: url,
-    //         data: {},
-    //         callback: getSubcategoriesCallback,
-    //     });
-    // };
-    const getSubcategoriesData = (categoryName) => {
-        let url = API_URLS.SUB_CATEGORIES;
-        if (categoryName) {
-            url += `?categoryName=${categoryName}`;
+    const handleCategoryChange = (updatedCategories) => {
+        setSelectedCategory(updatedCategories);
+        updatedCategories.forEach(categoryName => {
+            if (!subcategoryOptions.some(sub => sub.category === categoryName)) {
+                getSubcategoriesData(categoryName, true);
+            }
+        });
+        const removedCategories = subcategoryOptions
+            .map(sub => sub.category)
+            .filter(cat => !updatedCategories.includes(cat));
+
+        if (removedCategories.length > 0) {
+            setSubcategoryOptions(prev =>
+                prev.filter(sub => !removedCategories.includes(sub.category))
+            );
         }
+
+        setErrors(prev => ({ ...prev, category: "" }));
+    };
+    const getSubcategoriesCallback = (response, categoryName, merge = false) => {
+        if (response.status === 200) {
+            const subcategories = response.data.map(sub => ({
+                name: sub.name,
+                category: categoryName
+            }));
+
+            if (merge) {
+                setSubcategoryOptions(prev => [...prev, ...subcategories]);
+            } else {
+                setSubcategoryOptions(subcategories);
+            }
+        } else {
+            console.log("Error fetching subcategories for", categoryName);
+        }
+    };
+    const getSubcategoriesData = (categoryName, merge = false) => {
+        const url = `${API_URLS.SUB_CATEGORIES}?categoryName=${categoryName}`;
+
         apiCall({
             method: 'GET',
-            url: url,
+            url,
             data: {},
-            callback: getSubcategoriesCallback,
+            callback: (response) => getSubcategoriesCallback(response, categoryName, merge)
         });
-    };
-    const handleCategoryChange = (value) => {
-        setSelectedCategory(value);
-        setSelectedSubcategory("");      // old selection clear
-        setSubcategoryOptions([]);       // old options clear
-
-        if (value) {
-            getSubcategoriesData(value); // category-wise API call
-        }
-
-        setErrors(errors => ({ ...errors, category: "" }));
-    };
-
-
-    const getSubcategoriesCallback = (response) => {
-        if (response.status === 200) {
-            const subcategories = response.data.map(subcategory => subcategory.name);
-            setSubcategoryOptions(subcategories);
-            console.log('subcategories: ', subcategories);
-        } else {
-            console.log("Error fetching subcategories");
-        }
     };
     const getTemplateData = () => {
         apiCall({
@@ -226,56 +215,59 @@ function AddTemplate() {
             setLoading
         });
     };
+    // const getTemplateDataCallback = (response) => {
+    //     if (response.status === 200) {
+    //         const templateData = response.data;
+    //         const selectedCategories = templateData.categories.map(category => category.name);
+    //         const selectedSubcategories = templateData.sub_categories.map(subcategory => subcategory.name);
+    //         const selectedPlans = templateData.plans.map(plan => plan.name);
+
+
+    //         setSelectedPlan(selectedPlans || "");
+    //         setSelectedCategory(selectedCategories);
+    //         setSelectedSubcategory(selectedSubcategories);
+    //         console.log('selectedSubcategories: ', selectedSubcategories);
+    //         // setTemplateFileBase64(templateData.url || "");
+    //         setIsMultiImageBanner(templateData.has_multiple_images || false);
+    //     } else {
+    //         const errorMsg = response?.data?.error || "Failed to fetch template data";
+    //         toast.error(errorMsg, {
+    //             position: "top-center",
+    //             autoClose: 2000,
+    //         });
+    //     }
+    // };
     const getTemplateDataCallback = (response) => {
         if (response.status === 200) {
             const templateData = response.data;
-            const selectedCategories = templateData.categories.map(category => category.name);
-            const selectedSubcategories = templateData.sub_categories.map(subcategory => subcategory.name);
-            const selectedPlans = templateData.plans.map(plan => plan.name);
 
+            const selectedCategories = templateData.categories.map(c => c.name);
+            const selectedSubcategories = templateData.sub_categories.map(s => s.name);
+            const selectedPlans = templateData.plans.map(p => p.name);
 
-            setSelectedPlan(selectedPlans || "");
+            setSelectedPlan(selectedPlans[0] || "");
             setSelectedCategory(selectedCategories);
+
+            // Fetch subcategories for template categories
+            selectedCategories.forEach(cat => {
+                getSubcategoriesData(cat, true); // merge = true
+            });
+
             setSelectedSubcategory(selectedSubcategories);
-            // setTemplateFileBase64(templateData.url || "");
             setIsMultiImageBanner(templateData.has_multiple_images || false);
         } else {
             const errorMsg = response?.data?.error || "Failed to fetch template data";
-            toast.error(errorMsg, {
-                position: "top-center",
-                autoClose: 2000,
-            });
+            toast.error(errorMsg, { position: "top-center", autoClose: 2000 });
         }
     };
 
     const editTemplateData = () => {
         if (!validateTemplateData()) return;
-        // const requestData = {
-        //     plans: selectedPlan,
-        //     categories: selectedCategory,
-        //     sub_categories: selectedSubcategory,
-        //     url: templateFileBase64,
-        //     has_multiple_images: isMultiImageBanner
-        // };
-
-        const formData = new FormData();
-
-        formData.append("plans", selectedPlan);
-        formData.append("categories", selectedCategory);
-        formData.append("sub_categories", selectedSubcategory);
-        formData.append("has_multiple_images", isMultiImageBanner);
-
-        // if (templateImage)
-        //     formData.append("image", templateImage);
-
-        if (psdFile)
-            formData.append("psd_file", psdFile);
-
         apiCall({
             method: "PUT",
             url: `${API_URLS.TEMPLATES}/${template_id}`,
             // data: requestData,
-            data: formData,
+            // data: formData,
             callback: editTemplateCallback,
             setLoading
         });
@@ -365,33 +357,30 @@ function AddTemplate() {
                             }}
                             dropdownClassName="w-[80%]"
                             labelClassName="font-serif font-bold"
-                            error={errors.plan}
+
+                        // error={errors.plan}
                         />
                         <DropdownComponent
                             label="Category"
                             options={categoriesData}
                             value={selectedCategory}
-                            // onChange={(value) => {
-                            //     setSelectedCategory(value);
-                            //     setErrors(errors => ({ ...errors, category: "" }));
-                            // }}
                             onChange={handleCategoryChange}
                             dropdownClassName="w-[80%]"
-                            labelClassName="font-serif font-bold"
                             error={errors.category}
+                            isArray={true}
+
                         />
+
                         <DropdownComponent
                             label="Subcategory"
-                            options={subcategoryOptions}
+                            options={subcategoryOptions.map(sub => sub.name)}
                             value={selectedSubcategory}
-                            onChange={(value) => {
-                                setSelectedSubcategory(value);
-                                setErrors(errors => ({ ...errors, subcategory: "" }));
-                            }}
+                            onChange={setSelectedSubcategory}
                             dropdownClassName="w-[80%]"
-                            labelClassName="font-serif font-bold"
                             error={errors.subcategory}
-                            disabled={!selectedCategory}
+                            disabled={!selectedCategory.length}
+                            isArray={true}
+
                         />
 
                         <div className="flex items-center gap-2 mt-4">

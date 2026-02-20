@@ -1,23 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 
-function DropdownComponent({ label, options = [], value = "", onChange, dropdownClassName = "", error }) {
+function DropdownComponent({
+    label,
+    options = [],
+    value,
+    onChange,
+    dropdownClassName = "",
+    error,
+    disabled = false,
+    isArray = false
+}) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
-    const toggleDropdown = () => setIsOpen(!isOpen);
-    const handleCheckboxChange = (option) => {
-        const selected = value ? value.split(",").map(v => v.trim()) : [];
-        let newSelected = [];
+    const toggleDropdown = () => {
+        if (!disabled) setIsOpen(!isOpen);
+    };
+    const selected = Array.isArray(value) ? value : value ? value.split(", ").map(v => v.trim()) : [];
 
-        if (selected.includes(option)) {
-            newSelected = selected.filter(v => v !== option);
+    const handleOptionChange = (option) => {
+        const newSelected = selected.includes(option)
+            ? selected.filter(v => v !== option)
+            : [...selected, option];
+
+        if (isArray) {
+            onChange(newSelected);
         } else {
-            newSelected = [...selected, option];
+            onChange(newSelected.join(", "));
         }
-        onChange(newSelected.join(", "));
     };
 
-    const selected = value ? value.split(",").map(v => v.trim()) : [];
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -34,20 +46,23 @@ function DropdownComponent({ label, options = [], value = "", onChange, dropdown
         <div className={`relative ${dropdownClassName}`} ref={dropdownRef}>
             <label className="font-semibold mb-1 block">{label}</label>
             <div
-                className="mt-2 p-2 border border-gray-300 rounded bg-white cursor-pointer"
+                className={`mt-2 p-2 border rounded bg-white cursor-pointer ${disabled ? "bg-gray-100 cursor-not-allowed" : "border-gray-300"}`}
                 onClick={toggleDropdown}
             >
-                {value || `Select ${label}`}
+                {selected.length > 0 ? selected.join(", ") : `Select ${label}`}
             </div>
 
-            {isOpen && (
+            {isOpen && !disabled && (
                 <div className="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded shadow">
                     {options.map((option, idx) => (
-                        <label key={idx} className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                        <label
+                            key={idx}
+                            className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        >
                             <input
                                 type="checkbox"
                                 checked={selected.includes(option)}
-                                onChange={() => handleCheckboxChange(option)}
+                                onChange={() => handleOptionChange(option)}
                                 className="mr-2"
                             />
                             {option}
