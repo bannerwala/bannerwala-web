@@ -20,16 +20,7 @@ function App() {
       <Router>
         <ToastContainer />
         <Routes>
-          {/* <Route
-            path="privacyPolicy"
-            element={
-              <PublicRoute>
-                <PrivacyPolicy
-                PrivacyPolicy />
-              </PublicRoute>
-            }
-          /> */}
-
+         
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/add-template" element={<AddTemplate />} />
