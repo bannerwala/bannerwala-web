@@ -14,7 +14,7 @@ function AddTemplate() {
     const [selectedCategory, setSelectedCategory] = useState([]);
     const [subcategoryOptions, setSubcategoryOptions] = useState([]);
     const [selectedSubcategory, setSelectedSubcategory] = useState([]);
-    const [selectedPlan, setSelectedPlan] = useState([]);
+    // const [selectedPlan, setSelectedPlan] = useState([]);
     // const [templateFileBase64, setTemplateFileBase64] = useState("");
     const [categoriesData, setCategoriesData] = useState([]);
     // const [subcategoryOptions, setSubcategoryOptions] = useState([]);
@@ -24,7 +24,7 @@ function AddTemplate() {
     // const [fontFamily, setFontFamily] = useState("");
     // const [fontSize, setFontSize] = useState("");
     // const [fontColor, setFontColor] = useState("");
-    const [planOptions, setPlanOptions] = useState([]);
+    // const [planOptions, setPlanOptions] = useState([]);
     const [errors, setErrors] = useState({});
     // const [isMultiImageBanner, setIsMultiImageBanner] = useState(false);
     const [hasBannerFooter, setHasBannerFooter] = useState(false);
@@ -57,7 +57,7 @@ function AddTemplate() {
     useEffect(() => {
         getCategoriesData();
         // getSubcategoriesData();
-        getPlansData();
+        // getPlansData();
         if (template_id) getTemplateData();
     }, [template_id]);
     // const handleImageChange = (e) => {
@@ -73,23 +73,23 @@ function AddTemplate() {
         // setErrors(prev => ({ ...prev, psd: "" }));
     };
 
-    const getPlansData = () => {
-        apiCall({
-            method: "GET",
-            url: API_URLS.SUBSCRIPTION_PLANS,
-            data: {},
-            callback: getPlansCallback,
-        });
-    };
+    // const getPlansData = () => {
+    //     apiCall({
+    //         method: "GET",
+    //         url: API_URLS.SUBSCRIPTION_PLANS,
+    //         data: {},
+    //         callback: getPlansCallback,
+    //     });
+    // };
 
-    const getPlansCallback = (response) => {
-        if (response.status === 200) {
-            const plans = response.data.map(plan => plan.name);
-            setPlanOptions(plans);
-        } else {
-            console.log("Failed to fetch plans");
-        }
-    };
+    // const getPlansCallback = (response) => {
+    //     if (response.status === 200) {
+    //         const plans = response.data.map(plan => plan.name);
+    //         setPlanOptions(plans);
+    //     } else {
+    //         console.log("Failed to fetch plans");
+    //     }
+    // };
 
     const addTemplatesCallback = (response) => {
         console.log('response: ', response);
@@ -132,7 +132,7 @@ function AddTemplate() {
         if (!validateTemplateData()) return;
         const formData = new FormData();
 
-        formData.append("plans", selectedPlan);
+        // formData.append("plans", selectedPlan);
         formData.append("categories", selectedCategory || "");
         formData.append("sub_categories", selectedSubcategory || "");
         // formData.append("has_multiple_images", isMultiImageBanner);
@@ -231,8 +231,8 @@ function AddTemplate() {
 
             const selectedCategories = templateData.categories.map(c => c.name);
             const selectedSubcategories = templateData.sub_categories.map(s => s.name);
-            const selectedPlans = templateData.plans.map(p => p.name);
-            setSelectedPlan(selectedPlans);
+            // const selectedPlans = templateData.plans.map(p => p.name);
+            // setSelectedPlan(selectedPlans);
             setSelectedCategory(selectedCategories);
             selectedCategories.forEach(cat => {
                 getSubcategoriesData(cat, true);
@@ -240,7 +240,7 @@ function AddTemplate() {
 
             setSelectedSubcategory(selectedSubcategories);
             // setIsMultiImageBanner(templateData.has_multiple_images || false);
-            setHasBannerFooter(templateData.has_banner_footer || false);
+            // setHasBannerFooter(templateData.has_banner_footer || false);
 
             setPreviewImage(templateData.url);
         } else {
@@ -251,11 +251,14 @@ function AddTemplate() {
 
     const editTemplateData = () => {
         if (!validateTemplateData()) return;
+        console.log('selectedCategory: ', selectedCategory);
+        console.log('selectedSubcategory: ', selectedSubcategory);
+
         const requestData = {
             // plans: selectedPlan.join(","),
             categories: selectedCategory.join(","),
             sub_categories: selectedSubcategory.join(","),
-            has_banner_footer: hasBannerFooter
+            // has_banner_footer: hasBannerFooter
         };
 
 
@@ -358,21 +361,22 @@ function AddTemplate() {
                                 <span className="text-red-500 text-sm">{errors.image}</span>
                             )} */}
                         </div>
-                        <DropdownComponent
-                            label="Plan"
-                            options={planOptions}
-                            value={selectedPlan}
-                            onChange={(value) => {
-                                setSelectedPlan(value);
-                                setErrors(errors => ({ ...errors, plan: "" }));
-                            }}
-                            dropdownClassName="w-[80%]"
-                            labelClassName="font-serif font-bold"
-                            isArray={true}
+                        {/* {!template_id && (
+                            <DropdownComponent
+                                label="Plan"
+                                options={planOptions}
+                                value={selectedPlan}
+                                onChange={(value) => {
+                                    setSelectedPlan(value);
+                                    setErrors(errors => ({ ...errors, plan: "" }));
+                                }}
+                                dropdownClassName="w-[80%]"
+                                labelClassName="font-serif font-bold"
+                                isArray={true}
 
 
-                        // error={errors.plan}
-                        />
+                            // error={errors.plan}
+                            />)} */}
                         <DropdownComponent
                             label="Category"
                             options={categoriesData}
@@ -399,15 +403,18 @@ function AddTemplate() {
                             isArray={true}
 
                         />
-
-                        <div className="flex items-center gap-2 mt-4">
-                            <input
-                                type="checkbox"
-                                checked={hasBannerFooter}
-                                onChange={(e) => setHasBannerFooter(e.target.checked)}
-                            />
-                            <label className="font-serif font-bold">Has Banner Footer</label>
-                        </div>
+                        {!template_id && (
+                            <div className="flex items-center gap-2 mt-4">
+                                <input
+                                    type="checkbox"
+                                    checked={hasBannerFooter}
+                                    onChange={(e) => setHasBannerFooter(e.target.checked)}
+                                />
+                                <label className="font-serif font-bold">
+                                    Has Banner Footer
+                                </label>
+                            </div>
+                        )}
                         {/* <div className="col-span-2">
                             <div className="font-serif font-bold mb-2">Title</div>
                             <div className="grid grid-cols-3 gap-4">
