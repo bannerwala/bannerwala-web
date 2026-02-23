@@ -7,6 +7,7 @@ import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
 import DropdownInputComponent from "../../CustomComponents/DropdownInputComponent/DropdownInputComponent";
 import { API_URLS } from "../../Utils/AppConst";
+import { toast } from "react-toastify";
 export default function Dashboard() {
     const [category, setCategory] = useState("");
     const [subcategory, setSubcategory] = useState("");
@@ -156,6 +157,30 @@ export default function Dashboard() {
         getSubcategoriesData();
         getTemplateData({ category: "", subcategory: "", offsetValue: 0, limitValue: initialLimit });
     };
+    const deleteTemplateCallback = (response, templateId) => {
+        setLoading(false);
+        if (response.status === 200) {
+            toast.success("Template deleted successfully!", {
+                position: "top-center",
+                autoClose: 2000
+            });
+            setTemplates(prev => prev.filter(t => t._id !== templateId));
+        } else {
+            const errorMsg = response?.data?.error || "Failed to delete template";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
+        }
+    };
+    const deleteTemplate = (templateId) => {
+        setLoading(true);
+        apiCall({
+            method: "DELETE",
+            url: `${API_URLS.TEMPLATES}/${templateId}`,
+            callback: (response) => deleteTemplateCallback(response, templateId)
+        });
+    };
     return (
         <div className="min-h-screen flex">
             <DashboardSideBar />
@@ -227,10 +252,14 @@ export default function Dashboard() {
                     {templates.map((cat, i) => (
                         <div key={i} className="relative cursor-pointer group">
                             <CategoryCardComponent img={cat.url} />
-                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300">
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300 flex gap-1">
                                 <i
                                     className="fa fa-edit text-white bg-black p-1 rounded cursor-pointer"
                                     onClick={() => navigate(`/add-template/${cat._id}`)}
+                                />
+                                <i
+                                    className="fa fa-trash text-white bg-red-600 p-1 rounded cursor-pointer"
+                                    onClick={() => deleteTemplate(cat._id)}
                                 />
                             </div>
                         </div>

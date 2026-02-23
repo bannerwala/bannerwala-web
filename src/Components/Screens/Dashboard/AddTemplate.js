@@ -240,7 +240,7 @@ function AddTemplate() {
 
             setSelectedSubcategory(selectedSubcategories);
             // setIsMultiImageBanner(templateData.has_multiple_images || false);
-            // setHasBannerFooter(templateData.has_banner_footer || false);
+            setHasBannerFooter(templateData.has_banner_footer || false);
 
             setPreviewImage(templateData.url);
         } else {
@@ -258,7 +258,7 @@ function AddTemplate() {
             // plans: selectedPlan.join(","),
             categories: selectedCategory.join(","),
             sub_categories: selectedSubcategory.join(","),
-            // has_banner_footer: hasBannerFooter
+            has_banner_footer: hasBannerFooter
         };
 
 
@@ -403,18 +403,16 @@ function AddTemplate() {
                             isArray={true}
 
                         />
-                        {!template_id && (
-                            <div className="flex items-center gap-2 mt-4">
-                                <input
-                                    type="checkbox"
-                                    checked={hasBannerFooter}
-                                    onChange={(e) => setHasBannerFooter(e.target.checked)}
-                                />
-                                <label className="font-serif font-bold">
-                                    Has Banner Footer
-                                </label>
-                            </div>
-                        )}
+                        <div className="flex items-center gap-2 mt-4">
+                            <input
+                                type="checkbox"
+                                checked={hasBannerFooter}
+                                onChange={(e) => setHasBannerFooter(e.target.checked)}
+                            />
+                            <label className="font-serif font-bold">
+                                Has Banner Footer
+                            </label>
+                        </div>
                         {/* <div className="col-span-2">
                             <div className="font-serif font-bold mb-2">Title</div>
                             <div className="grid grid-cols-3 gap-4">
