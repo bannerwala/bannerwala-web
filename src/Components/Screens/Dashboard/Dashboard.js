@@ -8,6 +8,7 @@ import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComp
 import DropdownInputComponent from "../../CustomComponents/DropdownInputComponent/DropdownInputComponent";
 import { API_URLS } from "../../Utils/AppConst";
 import { toast } from "react-toastify";
+import CustomConfirmationPopup from "../../CustomComponents/CustomConfirmationPopup/CustomConfirmationPopup";
 export default function Dashboard() {
     const [category, setCategory] = useState("");
     const [subcategory, setSubcategory] = useState("");
@@ -17,6 +18,8 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(false)
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [showDeletePopup, setShowDeletePopup] = useState(false);
+    const [templateToDelete, setTemplateToDelete] = useState(null);
     const initialLimit = 10; // First load
     const scrollLimit = 2;   // After scroll
     const navigate = useNavigate();
@@ -157,14 +160,23 @@ export default function Dashboard() {
         getSubcategoriesData();
         getTemplateData({ category: "", subcategory: "", offsetValue: 0, limitValue: initialLimit });
     };
-    const deleteTemplateCallback = (response, templateId) => {
+    const deleteTemplateCallback = (response) => {
         setLoading(false);
         if (response.status === 200) {
             toast.success("Template deleted successfully!", {
                 position: "top-center",
                 autoClose: 2000
             });
-            setTemplates(prev => prev.filter(t => t._id !== templateId));
+            setOffset(0);
+            setHasMore(true);
+            setTemplates([]);
+
+            getTemplateData({
+                category,
+                subcategory,
+                offsetValue: 0,
+                limitValue: initialLimit
+            });
         } else {
             const errorMsg = response?.data?.error || "Failed to delete template";
             toast.error(errorMsg, {
@@ -181,6 +193,19 @@ export default function Dashboard() {
             callback: (response) => deleteTemplateCallback(response, templateId)
         });
     };
+    const handleConfirmDelete = () => {
+        if (!templateToDelete) return;
+
+        deleteTemplate(templateToDelete);
+        setShowDeletePopup(false);
+        setTemplateToDelete(null);
+    };
+
+    const handleCancelDelete = () => {
+        setShowDeletePopup(false);
+        setTemplateToDelete(null);
+    };
+
     return (
         <div className="min-h-screen flex">
             <DashboardSideBar />
@@ -259,7 +284,10 @@ export default function Dashboard() {
                                 />
                                 <i
                                     className="fa fa-trash text-white bg-red-600 p-1 rounded cursor-pointer"
-                                    onClick={() => deleteTemplate(cat._id)}
+                                    onClick={() => {
+                                        setTemplateToDelete(cat._id);
+                                        setShowDeletePopup(true);
+                                    }}
                                 />
                             </div>
                         </div>
@@ -271,7 +299,13 @@ export default function Dashboard() {
                         </div>
                     )}
                 </div>
-
+                {showDeletePopup && (
+                    <CustomConfirmationPopup
+                        label="Are you sure you want to delete this Template?"
+                        handleCancelButton={handleCancelDelete}
+                        handleDeleteButton={handleConfirmDelete}
+                    />
+                )}
             </div>
         </div>
 
