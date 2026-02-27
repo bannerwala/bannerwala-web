@@ -95,10 +95,10 @@ function Login() {
             // localStorage.setItem("loggedinPhoneNumber", loginFormData.contact_number);
             localStorage.setItem('loggedInUser', JSON.stringify(response.data.user));
             localStorage.setItem('token', response.data.token);
-            toast.success("Logged in successfully!", {
-                position: "top-center",
-                autoClose: 2000,
-            });
+            // toast.success("Logged in successfully!", {
+            //     position: "top-center",
+            //     autoClose: 2000,
+            // });
             navigate("/dashboard");
         } else {
             const errorMsg = response?.data?.error || "Login failed. Please check your credentials.";

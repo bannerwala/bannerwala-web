@@ -275,20 +275,22 @@ export default function Dashboard() {
                     className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto"
                 >
                     {templates.map((cat, i) => (
-                        <div key={i} className="relative cursor-pointer group">
-                            <CategoryCardComponent img={cat.url} />
-                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300 flex gap-1">
-                                <i
-                                    className="fa fa-edit text-white bg-black p-1 rounded cursor-pointer"
-                                    onClick={() => navigate(`/add-template/${cat._id}`)}
-                                />
-                                <i
-                                    className="fa fa-trash text-white bg-red-600 p-1 rounded cursor-pointer"
-                                    onClick={() => {
-                                        setTemplateToDelete(cat._id);
-                                        setShowDeletePopup(true);
-                                    }}
-                                />
+                        <div key={i} className="relative cursor-pointer ">
+                            <div className="group relative">
+                                <CategoryCardComponent img={cat.url} />
+                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300 flex gap-1">
+                                    <i
+                                        className="fa fa-edit text-white bg-black p-1 rounded cursor-pointer"
+                                        onClick={() => navigate(`/add-template/${cat._id}`)}
+                                    />
+                                    <i
+                                        className="fa fa-trash text-white bg-red-600 p-1 rounded cursor-pointer"
+                                        onClick={() => {
+                                            setTemplateToDelete(cat._id);
+                                            setShowDeletePopup(true);
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
                     ))}
