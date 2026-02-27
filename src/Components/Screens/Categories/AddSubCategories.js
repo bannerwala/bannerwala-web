@@ -54,7 +54,7 @@ function AddSubCategories() {
             const subcategory = response.data;
             setSubCategoryData({
                 name: subcategory.name || "",
-                category: subcategory.category?.map(cat => cat.name).join(",") || "",
+                category: subcategory.category?.map(category => category.name)  || "",
             });
         } else {
             console.log("Failed to fetch subcategory details");
