@@ -90,26 +90,41 @@ export default function Dashboard() {
         getTemplateData({ category, subcategory: value, offsetValue: 0, limitValue: initialLimit });
     };
 
-    // const getTemplatesCallback = (response, offsetValue, isInitial) => {
-    //     if (response.status === 200) {
-    //         const newTemplates = response.data || [];
-    //         if (offsetValue === 0) {
-    //             setTemplates(newTemplates);
-    //         } else {
-    //             setTemplates((prev) => [...prev, ...newTemplates]);
-    //         }
-    //         setHasMore(newTemplates.length === limit);
-    //         setOffset(offsetValue + newTemplates.length);
-    //     } else {
-    //         console.error("Failed to fetch templates", response);
-    //     }
-    //     if (isInitial) setLoading(false);
-    // };
-    const getTemplatesCallback = (response, currentOffset, limitUsed) => {
+
+
+
+    const getTemplatesCallback = async (response, currentOffset, limitUsed) => {
         if (response.status === 200) {
-            const newTemplates = response.data || [];
-            if (currentOffset === 0) setTemplates(newTemplates);
-            else setTemplates(prev => [...prev, ...newTemplates]);
+            const templateList = response.data || [];
+            const newTemplates = await Promise.all(
+                templateList.map(async (template) => {
+                    const fileKey = template.url?.key;
+
+                    if (!fileKey) return template;
+                    try {
+                        const res = await fetch(
+                            `${API_URLS.TEMPLATES}/signed-url?key=${fileKey}`
+                        );
+
+                        const data = await res.json();
+
+                        return {
+                            ...template,
+                            url: data.url
+                        };
+
+                    } catch (error) {
+                        console.error("Signed URL error:", error);
+                        return template;
+                    }
+                })
+            );
+            // const newTemplates = response.data || [];
+            if (currentOffset === 0)
+                setTemplates(newTemplates);
+            else
+                setTemplates(prev => [...prev, ...newTemplates]);
+
             setHasMore(newTemplates.length === limitUsed);
             setOffset(currentOffset + newTemplates.length);
         }
@@ -120,6 +135,7 @@ export default function Dashboard() {
         setLoading(true);
         // let url = `${API_URLS.TEMPLATES}?limit=${limit}&offset=${offset}`;
         // let url = API_URLS.TEMPLATES_URLS;
+        // let url =`${API_URLS.TEMPLATES}/signed-url?key=""`;
         let url = `${API_URLS.TEMPLATES}?limit=${limitValue}&offset=${offsetValue}`;
         if (category) url += `&category=${category}`;
         if (subcategory) url += `&sub_category=${subcategory}`;
