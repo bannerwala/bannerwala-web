@@ -20,8 +20,6 @@ export default function Dashboard() {
     const [hasMore, setHasMore] = useState(true);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [templateToDelete, setTemplateToDelete] = useState(null);
-    const initialLimit = 10; // First load
-    const scrollLimit = 2;   // After scroll
     const navigate = useNavigate();
     const fetchCategoriesCallback = (response) => {
         if (response.status === 200) {
@@ -58,16 +56,7 @@ export default function Dashboard() {
             callback: fetchSubcategoriesCallback
         });
     };
-    // const handleCategoryChange = (value) => {
-    //     setCategory(value);
-    //     setSubcategory("");
-
-    //     if (value) {
-    //         getSubcategoriesData(value);
-    //     } else {
-    //         getSubcategoriesData();
-    //     }
-    // };
+    
     const handleCategoryChange = (value) => {
         setCategory(value);
         setSubcategory(""); // reset subcategory
@@ -76,24 +65,22 @@ export default function Dashboard() {
         } else {
             setSubcategoryOptions([]); // clear subcategories if no category
         }
-        setOffset(0);
         setHasMore(true);
         setTemplates([]);
-        getTemplateData({ category: value, subcategory: "", offsetValue: 0, limitValue: initialLimit });
+        getTemplateData({ category: value, subcategory: ""});
     };
 
     const handleSubcategoryChange = (value) => {
         setSubcategory(value);
-        setOffset(0);
         setHasMore(true);
         setTemplates([]);
-        getTemplateData({ category, subcategory: value, offsetValue: 0, limitValue: initialLimit });
+        getTemplateData({ category, subcategory: value });
     };
 
 
 
 
-    const getTemplatesCallback = async (response, currentOffset, limitUsed) => {
+    const getTemplatesCallback = async (response, limitUsed) => {
         if (response.status === 200) {
             const templateList = response.data || [];
             const newTemplates = await Promise.all(
@@ -119,37 +106,28 @@ export default function Dashboard() {
                     }
                 })
             );
-            // const newTemplates = response.data || [];
-            if (currentOffset === 0)
-                setTemplates(newTemplates);
-            else
                 setTemplates(prev => [...prev, ...newTemplates]);
 
             setHasMore(newTemplates.length === limitUsed);
-            setOffset(currentOffset + newTemplates.length);
         }
         setLoading(false);
     };
-    const getTemplateData = ({ category, subcategory, offsetValue = 0, limitValue }) => {
+    const getTemplateData = ({ category, subcategory }) => {
         if (loading) return;
         setLoading(true);
-        // let url = `${API_URLS.TEMPLATES}?limit=${limit}&offset=${offset}`;
-        // let url = API_URLS.TEMPLATES_URLS;
-        // let url =`${API_URLS.TEMPLATES}/signed-url?key=""`;
-        let url = `${API_URLS.TEMPLATES}?limit=${limitValue}&offset=${offsetValue}`;
+        let url = `${API_URLS.TEMPLATES}`;
         if (category) url += `&category=${category}`;
         if (subcategory) url += `&sub_category=${subcategory}`;
         apiCall({
             method: "GET",
             url,
             data: {},
-            callback: (response) => getTemplatesCallback(response, offsetValue, limitValue)
+            callback: (response) => getTemplatesCallback(response,)
         });
     };
     useEffect(() => {
         getCategoriesData();
-        // getSubcategoriesData();
-        getTemplateData({ category: "", subcategory: "", offsetValue: 0, limitValue: initialLimit });
+        getTemplateData({ category: "", subcategory: "" });
     }, []);
     const handleAddTemplateClick = () => {
         navigate("/add-template");
@@ -158,14 +136,14 @@ export default function Dashboard() {
         const { scrollTop, scrollHeight, clientHeight } = e.target;
         const isBottom = scrollTop + clientHeight >= scrollHeight - 5;
         if (isBottom && hasMore && !loading) {
-            getTemplateData({ category, subcategory, offsetValue: offset, limitValue: scrollLimit });
+            getTemplateData({ category, subcategory});
         }
     };
     const handleSearchFilter = () => {
         setOffset(0);
         setHasMore(true);
         setTemplates([]);
-        getTemplateData({ category, subcategory, offsetValue: 0, limitValue: initialLimit });
+        getTemplateData({ category, subcategory});
     };
     const handleResetFilter = () => {
         setCategory('');
@@ -174,7 +152,7 @@ export default function Dashboard() {
         setHasMore(true);
         setTemplates([]);
         getSubcategoriesData();
-        getTemplateData({ category: "", subcategory: "", offsetValue: 0, limitValue: initialLimit });
+        getTemplateData({ category: "", subcategory: "" });
     };
     const deleteTemplateCallback = (response) => {
         setLoading(false);
@@ -190,8 +168,6 @@ export default function Dashboard() {
             getTemplateData({
                 category,
                 subcategory,
-                offsetValue: 0,
-                limitValue: initialLimit
             });
         } else {
             const errorMsg = response?.data?.error || "Failed to delete template";
@@ -256,13 +232,6 @@ export default function Dashboard() {
                                 disabled={!category}
                             />
                         </div>
-                        {/* <PrimaryButtonComponent
-                            label="Search"
-                            icon="fa fa-search"
-                            onClick={handleSearchFilter}
-                            buttonClassName="py-1 px-3 text-sm font-bold"
-
-                        /> */}
                         <PrimaryButtonComponent
                             label="Reset"
                             icon="fa fa-refresh"
@@ -272,20 +241,6 @@ export default function Dashboard() {
                         />
                     </div>
                 </div>
-                {/* <div onScroll={handleScroll} className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto">
-                    {templates && templates.map((cat, i) => (
-                        <div key={i} className="relative cursor-pointer group">
-                            <CategoryCardComponent img={cat.url} />
-                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300">
-                                <i
-                                    className="fa fa-edit text-white bg-black p-1 rounded cursor-pointer"
-                                    onClick={() => navigate(`/add-template/${cat._id}`)}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
- */}
                 <div
                     onScroll={handleScroll}
                     className="grid grid-cols-5 gap-6 h-[77vh] overflow-y-auto"
