@@ -16,7 +16,6 @@ export default function Dashboard() {
     const [subcategoryOptions, setSubcategoryOptions] = useState([]);
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(false)
-    const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [templateToDelete, setTemplateToDelete] = useState(null);
@@ -56,30 +55,33 @@ export default function Dashboard() {
             callback: fetchSubcategoriesCallback
         });
     };
-    
+
+    // const handleCategoryChange = (value) => {
+    //     setCategory(value);
+    //     setSubcategory(""); // reset subcategory
+    //     if (value) {
+    //         getSubcategoriesData(value);
+    //     } else {
+    //         setSubcategoryOptions([]); // clear subcategories if no category
+    //     }
+    //     setHasMore(true);
+    //     setTemplates([]);
+    //     getTemplateData({ category: value, subcategory: "" });
+    // };
     const handleCategoryChange = (value) => {
         setCategory(value);
-        setSubcategory(""); // reset subcategory
-        if (value) {
-            getSubcategoriesData(value);
-        } else {
-            setSubcategoryOptions([]); // clear subcategories if no category
-        }
-        setHasMore(true);
-        setTemplates([]);
-        getTemplateData({ category: value, subcategory: ""});
+        setSubcategory("");
+        getSubcategoriesData(value);
     };
-
+    // const handleSubcategoryChange = (value) => {
+    //     setSubcategory(value);
+    //     setHasMore(true);
+    //     setTemplates([]);
+    //     getTemplateData({ category, subcategory: value });
+    // };
     const handleSubcategoryChange = (value) => {
         setSubcategory(value);
-        setHasMore(true);
-        setTemplates([]);
-        getTemplateData({ category, subcategory: value });
     };
-
-
-
-
     const getTemplatesCallback = async (response, limitUsed) => {
         if (response.status === 200) {
             const templateList = response.data || [];
@@ -106,7 +108,7 @@ export default function Dashboard() {
                     }
                 })
             );
-                setTemplates(prev => [...prev, ...newTemplates]);
+            setTemplates(prev => [...prev, ...newTemplates]);
 
             setHasMore(newTemplates.length === limitUsed);
         }
@@ -127,6 +129,7 @@ export default function Dashboard() {
     };
     useEffect(() => {
         getCategoriesData();
+        getSubcategoriesData();
         getTemplateData({ category: "", subcategory: "" });
     }, []);
     const handleAddTemplateClick = () => {
@@ -136,20 +139,24 @@ export default function Dashboard() {
         const { scrollTop, scrollHeight, clientHeight } = e.target;
         const isBottom = scrollTop + clientHeight >= scrollHeight - 5;
         if (isBottom && hasMore && !loading) {
-            getTemplateData({ category, subcategory});
+            getTemplateData({ category, subcategory });
         }
     };
     const handleSearchFilter = () => {
-        setOffset(0);
         setHasMore(true);
         setTemplates([]);
-        getTemplateData({ category, subcategory});
+        getTemplateData({ category, subcategory });
     };
     const handleResetFilter = () => {
-        setCategory('');
-        setSubcategory('');
-        setOffset(0);
-        setHasMore(true);
+        // setCategory('');
+        // setSubcategory('');
+        // setOffset(0);
+        // setHasMore(true);
+        // setTemplates([]);
+        // getSubcategoriesData();
+        // getTemplateData({ category: "", subcategory: "" });
+        setCategory("");
+        setSubcategory("");
         setTemplates([]);
         getSubcategoriesData();
         getTemplateData({ category: "", subcategory: "" });
@@ -161,7 +168,6 @@ export default function Dashboard() {
                 position: "top-center",
                 autoClose: 2000
             });
-            setOffset(0);
             setHasMore(true);
             setTemplates([]);
 
@@ -201,7 +207,7 @@ export default function Dashboard() {
     return (
         <div className="min-h-screen flex">
             <DashboardSideBar />
-            {loading && offset === 0 && <Spinner />}
+            {loading && <Spinner />}
             <div className="w-full p-4">
                 <HeaderComponents
                     name="All Templates"
@@ -229,9 +235,14 @@ export default function Dashboard() {
                                 value={subcategory}
                                 onChange={handleSubcategoryChange}
                                 dropdownClassName="w-[90%]"
-                                disabled={!category}
+                            // disabled={!category}
                             />
                         </div>
+                        <PrimaryButtonComponent
+                            label="Search"
+                            icon="fa fa-search"
+                            onClick={handleSearchFilter}
+                        />
                         <PrimaryButtonComponent
                             label="Reset"
                             icon="fa fa-refresh"
@@ -265,10 +276,9 @@ export default function Dashboard() {
                             </div>
                         </div>
                     ))}
-
-                    {loading && offset !== 0 && (
+                    {loading && (
                         <div className="col-span-5 text-center py-4">
-                            Loading more templates...
+                            Loading templates...
                         </div>
                     )}
                 </div>

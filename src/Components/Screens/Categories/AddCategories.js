@@ -94,7 +94,7 @@ function AddCategories() {
                         type="text"
                         label={category_id ? "Edit Category" : "Add Category"}
                         name="name"
-                        placeholder="Enter Category Name"
+                        placeholder="Category"
                         value={categoryData.name}
                         onChange={handleInputChange}
                         inputClassName="w-[40%]"
