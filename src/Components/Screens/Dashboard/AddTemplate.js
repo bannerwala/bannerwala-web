@@ -387,22 +387,26 @@ function AddTemplate() {
                             isArray={true}
 
                         />
+                        <div
+                            className="w-[80%] cursor-not-allowed"
+                            title={!selectedCategory.length ? "Please select category first" : ""}
+                        >
+                            <DropdownComponent
+                                label="Subcategory"
+                                options={subcategoryOptions.map(sub => sub.name)}
+                                value={selectedSubcategory}
+                                // onChange={setSelectedSubcategory}
+                                onChange={(value) => {
+                                    setSelectedSubcategory(value);
+                                    setErrors(prev => ({ ...prev, subcategory: "" }));
+                                }}
+                                dropdownClassName="w-[80%]"
+                                error={errors.subcategory}
+                                disabled={!selectedCategory.length}
+                                isArray={true}
 
-                        <DropdownComponent
-                            label="Subcategory"
-                            options={subcategoryOptions.map(sub => sub.name)}
-                            value={selectedSubcategory}
-                            // onChange={setSelectedSubcategory}
-                            onChange={(value) => {
-                                setSelectedSubcategory(value);
-                                setErrors(prev => ({ ...prev, subcategory: "" }));
-                            }}
-                            dropdownClassName="w-[80%]"
-                            error={errors.subcategory}
-                            disabled={!selectedCategory.length}
-                            isArray={true}
-
-                        />
+                            />
+                        </div>
                         <div className="flex items-center gap-2 mt-4">
                             <input
                                 type="checkbox"
