@@ -1,5 +1,6 @@
 
 const BASE_URL = "https://bannerwala-backend.onrender.com/api";
+//  const BASE_URL = "http://localhost:5000/api";
 
 export const API_URLS = {
     CATEGORIES: `${BASE_URL}/categories`,

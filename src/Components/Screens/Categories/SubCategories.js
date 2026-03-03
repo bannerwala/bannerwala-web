@@ -59,10 +59,10 @@ function SubCategories() {
     const getSubCategories = ({ categoryName, subCategoryName } = {}) => {
         let url = API_URLS.SUB_CATEGORIES;
         if (subCategoryName) {
-            url += `?name=${(subCategoryName)}`;
+            url += `?subCategoryName=${(subCategoryName)}`;
         }
         if (categoryName) {
-            url += `?name=${(categoryName)}`;
+            url += `?categoryName=${(categoryName)}`;
         }
         apiCall({
             method: "GET",
