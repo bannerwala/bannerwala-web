@@ -225,7 +225,7 @@ function AddTemplate() {
             setLoading
         });
     };
-    const getTemplateDataCallback = (response) => {
+    const getTemplateDataCallback = async (response) => {
         if (response.status === 200) {
             const templateData = response.data.data;
 
@@ -242,7 +242,22 @@ function AddTemplate() {
             // setIsMultiImageBanner(templateData.has_multiple_images || false);
             setHasBannerFooter(templateData.has_banner_footer || false);
 
-            setPreviewImage(templateData.url);
+            // setPreviewImage(templateData.url);
+            const fileKey = templateData.url?.key;
+
+            if (fileKey) {
+                try {
+                    const res = await fetch(
+                        `${API_URLS.TEMPLATES}/signed-url?key=${fileKey}`
+                    );
+
+                    const data = await res.json();
+
+                    setPreviewImage(data.url);
+                } catch (error) {
+                    console.error("Signed URL error:", error);
+                }
+            }
         } else {
             const errorMsg = response?.data?.error || "Failed to fetch template data";
             toast.error(errorMsg, { position: "top-center", autoClose: 2000 });
