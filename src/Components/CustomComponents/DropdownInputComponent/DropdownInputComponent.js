@@ -62,7 +62,7 @@ export default function DropdownInputComponent({
             />
             {showDropdown && filteredOptions.length > 0 && (
                 <div
-                    className={`absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-y-auto ${dropdownClassName}`}
+                    className={`absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-y-auto ${dropdownClassName}`}
                 >
                     {filteredOptions.map((option, index) => (
                         <div
