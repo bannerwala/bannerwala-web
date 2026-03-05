@@ -117,7 +117,7 @@ export default function Dashboard() {
     const getTemplateData = ({ category, subcategory }) => {
         if (loading) return;
         setLoading(true);
-        let url = `${API_URLS.TEMPLATES}`;
+        let url = `${API_URLS.TEMPLATES}?`;
         if (category) url += `&category=${category}`;
         if (subcategory) url += `&sub_category=${subcategory}`;
         apiCall({
