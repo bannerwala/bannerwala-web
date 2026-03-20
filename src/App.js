@@ -32,11 +32,14 @@ function App() {
           <Route path="/subcategories" element={<SubCategories />} />
           <Route path="/add-subcategory" element={<AddSubCategories />} />
           <Route path="/add-subcategory/:subcategory_id?" element={<AddSubCategories />} />
-          <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
-
-
-
-
+          <Route
+              path="/privacyPolicy"
+              element={
+                <PublicRoute>
+                  <PrivacyPolicy />
+                </PublicRoute>
+              }
+            />
         </Routes>
       </Router>
     </div>
