@@ -15,8 +15,11 @@ function TableComponent({
                 {headers.map((header, index) => (
                     <div
                         key={index}
-                        className={`${header === "Actions" ? "flex-1 text-right" : "w-32"
+                        className={`${header === "Action"
+                            ? "w-auto text-right"
+                            : "flex-1"
                             }`}
+
                     >
                         {header}
                     </div>
@@ -42,8 +45,11 @@ function TableComponent({
                             {headers.map((key, colIndex) => (
                                 <div
                                     key={colIndex}
-                                    className={`${key === "Actions" ? "flex-1 text-right" : "w-32"
+                                    className={`${key === "Action"
+                                        ? "w-auto text-right"
+                                        : "flex-1"
                                         }`}
+
                                 >
                                     {key === "Profile" ? (
                                         <img
@@ -59,7 +65,7 @@ function TableComponent({
                         </div>
                         {/* EXPANDED ROW */}
                         {expandedRowIndex === rowIndex && (
-                            <div className="bg-gray-100 px-6 py-4 text-sm grid grid-cols-4 gap-4 border-t">
+                            <div className="bg-gray-100 px-6 py-4 text-sm grid grid-cols-4  rounded-t-lg gap-4 border-t">
                                 <div>
                                     <strong>DOB:</strong>
                                     <div className="text-gray-700">{row["Dob"]}</div>

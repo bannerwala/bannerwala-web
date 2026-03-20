@@ -225,7 +225,7 @@ function AddTemplate() {
             setLoading
         });
     };
-    const getTemplateDataCallback = (response) => {
+    const getTemplateDataCallback = async (response) => {
         if (response.status === 200) {
             const templateData = response.data.data;
 
@@ -240,9 +240,24 @@ function AddTemplate() {
 
             setSelectedSubcategory(selectedSubcategories);
             // setIsMultiImageBanner(templateData.has_multiple_images || false);
-            // setHasBannerFooter(templateData.has_banner_footer || false);
+            setHasBannerFooter(templateData.has_banner_footer || false);
 
-            setPreviewImage(templateData.url);
+            // setPreviewImage(templateData.url);
+            const fileKey = templateData.url?.key;
+
+            if (fileKey) {
+                try {
+                    const res = await fetch(
+                        `${API_URLS.TEMPLATES}/signed-url?key=${fileKey}`
+                    );
+
+                    const data = await res.json();
+
+                    setPreviewImage(data.url);
+                } catch (error) {
+                    console.error("Signed URL error:", error);
+                }
+            }
         } else {
             const errorMsg = response?.data?.error || "Failed to fetch template data";
             toast.error(errorMsg, { position: "top-center", autoClose: 2000 });
@@ -258,7 +273,7 @@ function AddTemplate() {
             // plans: selectedPlan.join(","),
             categories: selectedCategory.join(","),
             sub_categories: selectedSubcategory.join(","),
-            // has_banner_footer: hasBannerFooter
+            has_banner_footer: hasBannerFooter
         };
 
 
@@ -387,34 +402,36 @@ function AddTemplate() {
                             isArray={true}
 
                         />
+                        <div
+                            className="w-[80%] cursor-not-allowed"
+                            title={!selectedCategory.length ? "Please select category first" : ""}
+                        >
+                            <DropdownComponent
+                                label="Subcategory"
+                                options={subcategoryOptions.map(sub => sub.name)}
+                                value={selectedSubcategory}
+                                // onChange={setSelectedSubcategory}
+                                onChange={(value) => {
+                                    setSelectedSubcategory(value);
+                                    setErrors(prev => ({ ...prev, subcategory: "" }));
+                                }}
+                                dropdownClassName="w-[80%]"
+                                error={errors.subcategory}
+                                disabled={!selectedCategory.length}
+                                isArray={true}
 
-                        <DropdownComponent
-                            label="Subcategory"
-                            options={subcategoryOptions.map(sub => sub.name)}
-                            value={selectedSubcategory}
-                            // onChange={setSelectedSubcategory}
-                            onChange={(value) => {
-                                setSelectedSubcategory(value);
-                                setErrors(prev => ({ ...prev, subcategory: "" }));
-                            }}
-                            dropdownClassName="w-[80%]"
-                            error={errors.subcategory}
-                            disabled={!selectedCategory.length}
-                            isArray={true}
-
-                        />
-                        {!template_id && (
-                            <div className="flex items-center gap-2 mt-4">
-                                <input
-                                    type="checkbox"
-                                    checked={hasBannerFooter}
-                                    onChange={(e) => setHasBannerFooter(e.target.checked)}
-                                />
-                                <label className="font-serif font-bold">
-                                    Has Banner Footer
-                                </label>
-                            </div>
-                        )}
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 mt-4">
+                            <input
+                                type="checkbox"
+                                checked={hasBannerFooter}
+                                onChange={(e) => setHasBannerFooter(e.target.checked)}
+                            />
+                            <label className="font-serif font-bold">
+                                Has Banner Footer
+                            </label>
+                        </div>
                         {/* <div className="col-span-2">
                             <div className="font-serif font-bold mb-2">Title</div>
                             <div className="grid grid-cols-3 gap-4">

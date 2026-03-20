@@ -54,7 +54,7 @@ function AddSubCategories() {
             const subcategory = response.data;
             setSubCategoryData({
                 name: subcategory.name || "",
-                category: subcategory.category?.map(cat => cat.name).join(",") || "",
+                category: subcategory.category?.map(category => category.name)  || "",
             });
         } else {
             console.log("Failed to fetch subcategory details");
@@ -163,7 +163,7 @@ function AddSubCategories() {
                         placeholder="SubCategory"
                         value={subCategoryData.name}
                         onChange={handleInputChange}
-                        inputClassName="w-[190px]"
+                        inputClassName="w-[40%]"
                         error={errors.name}
                     />
                 </div>
@@ -176,7 +176,7 @@ function AddSubCategories() {
                             setSubCategoryData({ ...subCategoryData, category: selectedValue });
                             setErrors(errors => ({ ...errors, category: "" }));
                         }}
-                        dropdownClassName="w-[190px]"
+                        dropdownClassName="w-[40%]"
                         error={errors.category}
                     />
                 </div>
@@ -184,7 +184,7 @@ function AddSubCategories() {
                     <PrimaryButtonComponent
                         label="Submit"
                         onClick={handleSubmit}
-                        buttonClassName="w-[20%] bg-black text-white px-3 py-2 rounded-md"
+                        buttonClassName="bg-black text-white px-5 py-2 rounded-md"
                     />
                 </div>
             </div>

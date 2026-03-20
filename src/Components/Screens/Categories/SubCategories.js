@@ -6,6 +6,9 @@ import TableComponent from "../../CustomComponents/TableComponent/TableComponent
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
 import { API_URLS } from "../../Utils/AppConst";
 import { SUB_CATEGORIES_COLUMNS } from "./Constants";
+import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
+import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
+import DropdownInputComponent from "../../CustomComponents/DropdownInputComponent/DropdownInputComponent";
 
 function SubCategories() {
     const navigate = useNavigate();
@@ -15,6 +18,8 @@ function SubCategories() {
     const [subCategories, setSubCategories] = useState([]);
     const [categoriesData, setCategoriesData] = useState([]);
     const [loading, setLoading] = useState(false)
+    const [categoryName, setCategoryName] = useState("");
+    const [subCategoryName, setSubCategoryName] = useState("");
     const getCategoriesData = () => {
         apiCall({
             method: "GET",
@@ -52,10 +57,17 @@ function SubCategories() {
             console.log("Failed to fetch subcategories");
         }
     };
-    const getSubCategories = () => {
+    const getSubCategories = ({ categoryName, subCategoryName } = {}) => {
+        let url = API_URLS.SUB_CATEGORIES;
+        if (subCategoryName) {
+            url += `?subCategoryName=${(subCategoryName)}`;
+        }
+        if (categoryName) {
+            url += `?categoryName=${(categoryName)}`;
+        }
         apiCall({
             method: "GET",
-            url: API_URLS.SUB_CATEGORIES,
+            url: url,
             data: {},
             callback: getSubCategoriesCallback,
             setLoading: setLoading
@@ -65,7 +77,15 @@ function SubCategories() {
         getSubCategories();
         getCategoriesData();
     }, []);
+    const handleSearchFilter = () => {
+        getSubCategories({ categoryName, subCategoryName });
+    };
 
+    const handleResetFilter = () => {
+        setCategoryName("");
+        setSubCategoryName("");
+        getSubCategories();
+    };
     return (
         <div className="min-h-screen flex">
             <DashboardSideBar />
@@ -78,6 +98,38 @@ function SubCategories() {
                     icon="fa fa-plus-circle"
                     buttonClassName="py-1 px-3 text-sm font-bold mb-3"
                 />
+                <div className="flex items-center gap-4 mb-4">
+                    <div>
+                        <InputComponents
+                            type="text"
+                            placeholder="SubCategory Name"
+                            value={subCategoryName}
+                            onChange={(e) => setSubCategoryName(e.target.value)}
+                            inputClassName="w-[200px]"
+                        />
+                    </div>
+                    <div>
+                        <DropdownInputComponent
+                            placeholder="Select Category"
+                            options={categoriesData}
+                            value={categoryName}
+                            onChange={(value) => setCategoryName(value)}
+                            dropdownClassName="w-[90%]"
+                        />
+                    </div>
+                    <PrimaryButtonComponent
+                        label="Search"
+                        icon="fa fa-search"
+                        buttonClassName="py-1 px-3"
+                        onClick={handleSearchFilter}
+                    />
+                    <PrimaryButtonComponent
+                        label="Reset"
+                        icon="fa fa-refresh"
+                        buttonClassName="py-1 px-3"
+                        onClick={handleResetFilter}
+                    />
+                </div>
                 <TableComponent
                     headers={SUB_CATEGORIES_COLUMNS}
                     data={subCategories}

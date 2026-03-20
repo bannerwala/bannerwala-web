@@ -6,10 +6,13 @@ import { useEffect, useState } from "react";
 import HeaderComponents from "../../CustomComponents/HeaderComponents/HeaderComponents";
 import { API_URLS } from "../../Utils/AppConst";
 import { CATEGORIES_COLUMNS } from "./Constants";
+import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
+import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
 
 function Categories() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false)
+    const [categoryName, setCategoryName] = useState("");
     const navigate = useNavigate();
     const handleAddClick = () => {
         navigate("/add-category");
@@ -33,10 +36,14 @@ function Categories() {
             console.log("Failed to fetch categories");
         }
     };
-    const getCategories = () => {
+    const getCategories = ({ categoryName } = {}) => {
+        let url = API_URLS.CATEGORIES;
+        if (categoryName) {
+            url += `?name=${(categoryName)}`;
+        }
         apiCall({
             method: "GET",
-            url: API_URLS.CATEGORIES,
+            url: url,
             callback: getCategoriesCallback,
             setLoading: setLoading
         });
@@ -45,6 +52,14 @@ function Categories() {
     useEffect(() => {
         getCategories();
     }, []);
+    const handleSearchFilter = () => {
+        getCategories({ categoryName });
+    };
+    const handleResetFilter = () => {
+        setCategoryName("");
+        getCategories();
+    };
+
     return (
         <div className="min-h-screen flex">
             <DashboardSideBar />
@@ -57,6 +72,27 @@ function Categories() {
                     onClick={handleAddClick}
                     buttonClassName="py-1 px-3 text-sm font-bold mb-2"
                 />
+                <div className="flex items-center gap-4 mb-4">
+                    <InputComponents
+                        type="text"
+                        placeholder="Category Name"
+                        value={categoryName}
+                        onChange={(e) => setCategoryName(e.target.value)}
+                        inputClassName="w-[200px]"
+                    />
+                    <PrimaryButtonComponent
+                        label="Search"
+                        icon="fa fa-search"
+                        buttonClassName="py-1 px-3"
+                        onClick={handleSearchFilter}
+                    />
+                    <PrimaryButtonComponent
+                        label="Reset"
+                        icon="fa fa-refresh"
+                        buttonClassName="py-1 px-3"
+                        onClick={handleResetFilter}
+                    />
+                </div>
                 <TableComponent
                     headers={CATEGORIES_COLUMNS}
                     data={categories}

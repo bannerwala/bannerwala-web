@@ -94,10 +94,10 @@ function AddCategories() {
                         type="text"
                         label={category_id ? "Edit Category" : "Add Category"}
                         name="name"
-                        placeholder="Enter Category Name"
+                        placeholder="Category"
                         value={categoryData.name}
                         onChange={handleInputChange}
-                        inputClassName="w-[190px]"
+                        inputClassName="w-[40%]"
                     />
                     {error && (
                         <div className="text-red-600 text-sm mt-1">
@@ -109,7 +109,7 @@ function AddCategories() {
                     <PrimaryButtonComponent
                         label="Submit"
                         onClick={handleSubmit}
-                        buttonClassName="w-[20%] bg-black text-white px-3 py-2 rounded-md"
+                        buttonClassName="bg-black text-white px-5 py-2 rounded-md"
                     />
                 </div>
             </div>

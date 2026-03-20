@@ -21,12 +21,12 @@ function DashboardSideBar() {
                     buttonClassName="bg-white text-gray-800 hover:bg-gray-300"
                     onClick={() => navigate("/users")}
                 />
-                <PrimaryButtonComponent
+                {/* <PrimaryButtonComponent
                     label="Subscription Plans"
                     icon="fa fa-credit-card"
                     buttonClassName="bg-white text-gray-800 hover:bg-gray-300"
                     onClick={() => navigate("/plans")}
-                />
+                /> */}
                 <PrimaryButtonComponent
                     label="Categories"
                     icon="fa fa-list"
@@ -46,6 +46,9 @@ function DashboardSideBar() {
                     icon="fa fa-sign-out"
                     buttonClassName="bg-red-600 text-white hover:bg-red-700"
                     onClick={() => {
+                        localStorage.removeItem("isAuthenticated");
+                        localStorage.removeItem("loggedInUser");
+                        localStorage.removeItem("token");
                         navigate("/");
                     }}
                 />
