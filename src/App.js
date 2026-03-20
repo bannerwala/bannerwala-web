@@ -10,6 +10,7 @@ import AddNewPlan from './Components/Screens/SubscriptionPlans/AddNewPlan';
 import { ToastContainer } from 'react-toastify';
 import AddSubCategories from './Components/Screens/Categories/AddSubCategories';
 import SubCategories from './Components/Screens/Categories/SubCategories';
+import PrivacyPolicy from './Components/Screens/PrivacyPolicy/PrivacyPolicy';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
       <Router>
         <ToastContainer />
         <Routes>
+         
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/add-template/:template_id?" element={<AddTemplate />} />
@@ -30,6 +32,11 @@ function App() {
           <Route path="/subcategories" element={<SubCategories />} />
           <Route path="/add-subcategory" element={<AddSubCategories />} />
           <Route path="/add-subcategory/:subcategory_id?" element={<AddSubCategories />} />
+          <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
+
+
+
+
         </Routes>
       </Router>
     </div>
