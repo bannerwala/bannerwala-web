@@ -38,7 +38,7 @@ function Login() {
 
         if (!loginFormData.contact_number.trim()) {
             newErrors.contact_number = "Please enter mobile number";
-        } else if (!/^[6-9]\d{9}$/.test(loginFormData.contact_number)) {
+        } else if (!/^[1-9]\d{9}$/.test(loginFormData.contact_number)) {
             newErrors.contact_number = "Enter valid 10-digit mobile number";
         }
 
