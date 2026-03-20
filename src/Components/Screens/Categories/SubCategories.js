@@ -8,6 +8,7 @@ import { API_URLS } from "../../Utils/AppConst";
 import { SUB_CATEGORIES_COLUMNS } from "./Constants";
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
 import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
+import DropdownInputComponent from "../../CustomComponents/DropdownInputComponent/DropdownInputComponent";
 
 function SubCategories() {
     const navigate = useNavigate();
@@ -98,20 +99,24 @@ function SubCategories() {
                     buttonClassName="py-1 px-3 text-sm font-bold mb-3"
                 />
                 <div className="flex items-center gap-4 mb-4">
-                    <InputComponents
-                        type="text"
-                        placeholder="Category Name"
-                        value={categoryName}
-                        onChange={(e) => setCategoryName(e.target.value)}
-                        inputClassName="w-[200px]"
-                    />
-                    <InputComponents
-                        type="text"
-                        placeholder="SubCategory Name"
-                        value={subCategoryName}
-                        onChange={(e) => setSubCategoryName(e.target.value)}
-                        inputClassName="w-[200px]"
-                    />
+                    <div>
+                        <InputComponents
+                            type="text"
+                            placeholder="SubCategory Name"
+                            value={subCategoryName}
+                            onChange={(e) => setSubCategoryName(e.target.value)}
+                            inputClassName="w-[200px]"
+                        />
+                    </div>
+                    <div>
+                        <DropdownInputComponent
+                            placeholder="Select Category"
+                            options={categoriesData}
+                            value={categoryName}
+                            onChange={(value) => setCategoryName(value)}
+                            dropdownClassName="w-[90%]"
+                        />
+                    </div>
                     <PrimaryButtonComponent
                         label="Search"
                         icon="fa fa-search"

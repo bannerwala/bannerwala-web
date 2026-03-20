@@ -225,7 +225,7 @@ function AddTemplate() {
             setLoading
         });
     };
-    const getTemplateDataCallback = (response) => {
+    const getTemplateDataCallback = async (response) => {
         if (response.status === 200) {
             const templateData = response.data.data;
 
@@ -242,7 +242,22 @@ function AddTemplate() {
             // setIsMultiImageBanner(templateData.has_multiple_images || false);
             setHasBannerFooter(templateData.has_banner_footer || false);
 
-            setPreviewImage(templateData.url);
+            // setPreviewImage(templateData.url);
+            const fileKey = templateData.url?.key;
+
+            if (fileKey) {
+                try {
+                    const res = await fetch(
+                        `${API_URLS.TEMPLATES}/signed-url?key=${fileKey}`
+                    );
+
+                    const data = await res.json();
+
+                    setPreviewImage(data.url);
+                } catch (error) {
+                    console.error("Signed URL error:", error);
+                }
+            }
         } else {
             const errorMsg = response?.data?.error || "Failed to fetch template data";
             toast.error(errorMsg, { position: "top-center", autoClose: 2000 });
@@ -387,22 +402,26 @@ function AddTemplate() {
                             isArray={true}
 
                         />
+                        <div
+                            className="w-[80%] cursor-not-allowed"
+                            title={!selectedCategory.length ? "Please select category first" : ""}
+                        >
+                            <DropdownComponent
+                                label="Subcategory"
+                                options={subcategoryOptions.map(sub => sub.name)}
+                                value={selectedSubcategory}
+                                // onChange={setSelectedSubcategory}
+                                onChange={(value) => {
+                                    setSelectedSubcategory(value);
+                                    setErrors(prev => ({ ...prev, subcategory: "" }));
+                                }}
+                                dropdownClassName="w-[80%]"
+                                error={errors.subcategory}
+                                disabled={!selectedCategory.length}
+                                isArray={true}
 
-                        <DropdownComponent
-                            label="Subcategory"
-                            options={subcategoryOptions.map(sub => sub.name)}
-                            value={selectedSubcategory}
-                            // onChange={setSelectedSubcategory}
-                            onChange={(value) => {
-                                setSelectedSubcategory(value);
-                                setErrors(prev => ({ ...prev, subcategory: "" }));
-                            }}
-                            dropdownClassName="w-[80%]"
-                            error={errors.subcategory}
-                            disabled={!selectedCategory.length}
-                            isArray={true}
-
-                        />
+                            />
+                        </div>
                         <div className="flex items-center gap-2 mt-4">
                             <input
                                 type="checkbox"
