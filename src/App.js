@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Components/Screens/Login/Login';
 import Dashboard from './Components/Screens/Dashboard/Dashboard';
 import UsersList from './Components/Screens/UsersList/UsersList';
@@ -11,7 +11,11 @@ import { ToastContainer } from 'react-toastify';
 import AddSubCategories from './Components/Screens/Categories/AddSubCategories';
 import SubCategories from './Components/Screens/Categories/SubCategories';
 import PrivacyPolicy from './Components/Screens/PrivacyPolicy/PrivacyPolicy';
+const PublicRoute = ({ children }) => {
+  const isAuthenticated = false;
 
+  return !isAuthenticated ? children : <Navigate to="/" />;
+};
 
 function App() {
   return (
