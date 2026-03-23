@@ -2,7 +2,7 @@ function PrimaryButtonComponent({ label, buttonClassName, onClick, icon, iconPos
     return (
         <button
             onClick={onClick}
-            className={`py-2 px-3 bg-black text-white text-sm font-bold rounded items-center${buttonClassName}`}
+            className={`py-2 px-3  bg-slate-800 gap-2 text-white text-sm font-bold rounded  flex items-center justify-center gap-2${buttonClassName}`}
         >
             {icon && iconPosition === "left" && <i className={icon} aria-hidden="true"></i>}
             <span>{label}</span>

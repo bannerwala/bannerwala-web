@@ -1,4 +1,4 @@
-function InputComponents({ type, label, placeholder, value, onChange, inputClassName, name, error, maxLength }) {
+function InputComponents({ type, label, placeholder = "Select an option", value, onChange, inputClassName, name, error, maxLength }) {
     return (
         <div>
             {label && <label className="block mb-1 font-medium">{label}</label>}
