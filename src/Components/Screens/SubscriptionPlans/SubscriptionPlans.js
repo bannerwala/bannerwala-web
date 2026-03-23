@@ -4,6 +4,7 @@ import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponen
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar";
 import { useEffect, useState } from "react";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
+import { API_URLS } from "../../Utils/AppConst";
 
 function SubscriptionPlans() {
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ function SubscriptionPlans() {
     const getPlans = () => {
         apiCall({
             method: "GET",
-            url: "https://image-edit-backend.vercel.app/api/subscription-plans",
+            url: API_URLS.SUBSCRIPTION_PLANS,
             data: {},
             callback: getPlansCallback,
             setLoading: setLoading
@@ -32,10 +33,10 @@ function SubscriptionPlans() {
         getPlans();
     }, []);
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
             {loading && <Spinner />}
-            <div className="w-4/5 p-8">
+            <div className="w-full p-4">
                 <HeaderComponents
                     name="Subscription Plans"
                     icon="fa fa-plus-circle"

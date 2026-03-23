@@ -2,12 +2,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import InputComponents from "../../CustomComponents/InputComponents/InputComponents"
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent"
 import DashboardSideBar from "../DashboardSideBar/DashboardSideBar"
-import { apiCall } from "../../Utils/AxiosUtils";
+import { apiCall, Spinner } from "../../Utils/AxiosUtils";
 import { useEffect, useState } from "react";
 import DropdownComponent from "../../CustomComponents/DropdownComponent/DropdownComponent";
+import { API_URLS } from "../../Utils/AppConst";
+import { toast } from "react-toastify";
 
 function AddSubCategories() {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false)
     const [subCategoryData, setSubCategoryData] = useState({
         name: "",
         category: ""
@@ -30,10 +33,9 @@ function AddSubCategories() {
 
 
     const getCategoriesData = () => {
-        const url = "https://image-edit-backend.vercel.app/api/categories";
         apiCall({
             method: "GET",
-            url: url,
+            url: API_URLS.CATEGORIES,
             data: {},
             callback: getCategoriesCallback,
         });
@@ -47,41 +49,49 @@ function AddSubCategories() {
             console.log("Error fetching categories");
         }
     };
+    const getSubCategoryCallback = (response) => {
+        if (response.status === 200) {
+            const subcategory = response.data;
+            setSubCategoryData({
+                name: subcategory.name || "",
+                category: subcategory.category?.map(category => category.name)  || "",
+            });
+        } else {
+            console.log("Failed to fetch subcategory details");
+        }
+    };
     const getSubCategoryById = () => {
         apiCall({
             method: "GET",
-            url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
+            url: `${API_URLS.SUB_CATEGORIES}/${subcategory_id}`,
             data: {},
-            callback: (response) => {
-                if (response.status === 200) {
-                    const subcategory = response.data;
-                    setSubCategoryData({
-                        name: subcategory.name || "",
-                        category: subcategory.category?.name || "",
-                    });
-                } else {
-                    console.log("Failed to fetch subcategory details");
-                }
-            }
+            setLoading: setLoading,
+            callback: getSubCategoryCallback,
         });
     };
-
     const addSubCategoryCallback = (response) => {
-        if (response.status === 200) {
-            console.log("SubCategory added successfully");
+        if (response.status === 201) {
+            toast.success("SubCategory added successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
             setSubCategoryData({ name: "", category: "" });
             navigate("/subcategories");
         } else {
-            console.log("Failed to add subcategory");
+            const errorMsg = response?.data?.error || "Failed to add subcategory";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
         }
     };
+
     const validateSubCategory = () => {
         const newErrors = {};
 
-        // if (typeof subCategoryData.category !== "string" || !subCategoryData.category.trim()) {
-        //     newErrors.category = "Please select a category";
-        // }
-
+        if (!subCategoryData.category) {
+            newErrors.category = "Please select a category";
+        }
         if (!subCategoryData.name.trim()) {
             newErrors.name = "Please enter subcategory name";
         }
@@ -96,26 +106,37 @@ function AddSubCategories() {
         }
         apiCall({
             method: "POST",
-            url: "https://image-edit-backend.vercel.app/api/sub-categories",
+            url: API_URLS.SUB_CATEGORIES,
             data: subCategoryData,
             callback: addSubCategoryCallback,
         });
     };
+    const updateSubCategoryCallback = (response) => {
+        if (response.status === 200) {
+            toast.success("SubCategory updated successfully!", {
+                position: "top-center",
+                autoClose: 2000,
+            });
+            setTimeout(() => {
+                navigate("/subcategories");
+            }, 2000);
+        } else {
+            const errorMsg = response?.data?.error || "Failed to update subcategory";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
+        }
+    };
+
     const updateSubCategory = () => {
         if (!validateSubCategory()) return;
 
         apiCall({
             method: "PUT",
-            url: `https://image-edit-backend.vercel.app/api/sub-categories/${subcategory_id}`,
+            url: `${API_URLS.SUB_CATEGORIES}/${subcategory_id}`,
             data: subCategoryData,
-            callback: (response) => {
-                if (response.status === 200) {
-                    console.log("SubCategory updated successfully");
-                    navigate("/subcategories");
-                } else {
-                    console.log("Failed to update subcategory");
-                }
-            }
+            callback: updateSubCategoryCallback,
         });
     };
     const handleSubmit = () => {
@@ -127,12 +148,25 @@ function AddSubCategories() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen flex">
             <DashboardSideBar />
-            <div className="w-4/5 p-6">
-                <h2 className="text-xl font-bold mb-4">
+            <div className="w-full p-4">
+                {loading && <Spinner />}
+                <h2 className="text-xl font-serif mb-4">
                     {subcategory_id ? "Edit SubCategory" : "Add SubCategory"}
                 </h2>
+                <div className="mb-4">
+                    <InputComponents
+                        label="Add Subcategory"
+                        type="text"
+                        name="name"
+                        placeholder="SubCategory"
+                        value={subCategoryData.name}
+                        onChange={handleInputChange}
+                        inputClassName="w-[40%]"
+                        error={errors.name}
+                    />
+                </div>
                 <div className="mb-4">
                     <DropdownComponent
                         label="Add Category"
@@ -142,27 +176,15 @@ function AddSubCategories() {
                             setSubCategoryData({ ...subCategoryData, category: selectedValue });
                             setErrors(errors => ({ ...errors, category: "" }));
                         }}
-                        dropdownClassName="w-[190px]"
-                    // error={errors.category}
-                    />
-                </div>
-                <div className="mb-4">
-                    <InputComponents
-                        label="Add Subcategory"
-                        type="text"
-                        name="name"
-                        placeholder="SubCategory"
-                        value={subCategoryData.name}
-                        onChange={handleInputChange}
-                        inputClassName="w-[190px]"
-                        error={errors.name}
+                        dropdownClassName="w-[40%]"
+                        error={errors.category}
                     />
                 </div>
                 <div>
                     <PrimaryButtonComponent
                         label="Submit"
                         onClick={handleSubmit}
-                        buttonClassName="w-[20%] bg-black text-white px-3 py-2 rounded-md"
+                        buttonClassName="bg-black text-white px-5 py-2 rounded-md"
                     />
                 </div>
             </div>

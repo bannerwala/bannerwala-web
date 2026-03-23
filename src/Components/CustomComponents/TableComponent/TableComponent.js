@@ -1,28 +1,56 @@
-function TableComponent({ headers, data, expandedRowIndex, onRowClick, maxHeight = "h-full", }) {
-    const unknownUserImage = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-    return (
-        <div className={`w-full overflow-x-auto bg-white rounded-lg shadow relative ${maxHeight}`}>
-            <table className="min-w-full table-auto text-left">
-                <thead className="sticky top-0 bg-gray-200 text-gray-700 z-10">
-                    <tr>
-                        {headers.map((header, index) => (
-                            <th key={index} className="px-4 py-2 border-b capitalize">
-                                {header}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                {data.map((row, rowIndex) => (
-                    // <tr key={rowIndex} className="hover:bg-gray-100">
-                    <tbody key={rowIndex}>
-                        <tr
-                            className="hover:bg-gray-100 cursor-pointer"
-                            // onClick={() => onRowClick(rowIndex)}
-                            onClick={() => onRowClick && onRowClick(rowIndex)}
+function TableComponent({
+    headers,
+    data,
+    expandedRowIndex,
+    onRowClick,
+    maxHeight = "h-full",
+}) {
+    const unknownUserImage =
+        "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
+    return (
+        <div className={`w-full relative ${maxHeight} flex flex-col`}>
+            {/* HEADER */}
+            <div className="sticky top-0 z-10 bg-gray-200 rounded-t-lg px-5 py-3 flex text-sm font-semibold select-none">
+                {headers.map((header, index) => (
+                    <div
+                        key={index}
+                        className={`${header === "Action"
+                            ? "w-auto text-right"
+                            : "flex-1"
+                            }`}
+
+                    >
+                        {header}
+                    </div>
+                ))}
+            </div>
+
+            {/* ROWS container: scrollable only rows */}
+            <div className="overflow-y-auto flex-1 space-y-3 mt-1">
+                {data.map((row, rowIndex) => (
+                    <div
+                        key={rowIndex}
+                        className="bg-white rounded-lg shadow-sm border hover:shadow-md transition cursor-pointer"
+                        onClick={() => onRowClick && onRowClick(rowIndex)}
+                    >
+                        {/* MAIN ROW */}
+                        {/* <div className="flex items-center px-5 py-4"> */}
+                        <div
+                            className={`flex items-center px-5 py-4
+    ${expandedRowIndex === rowIndex ? "bg-gray-100" : "bg-white"}
+  `}
                         >
+
                             {headers.map((key, colIndex) => (
-                                <td key={colIndex} className="px-6 py-4 border-b">
+                                <div
+                                    key={colIndex}
+                                    className={`${key === "Action"
+                                        ? "w-auto text-right"
+                                        : "flex-1"
+                                        }`}
+
+                                >
                                     {key === "Profile" ? (
                                         <img
                                             src={row[key] || unknownUserImage}
@@ -32,24 +60,43 @@ function TableComponent({ headers, data, expandedRowIndex, onRowClick, maxHeight
                                     ) : (
                                         row[key]
                                     )}
-                                </td>
+                                </div>
                             ))}
-                        </tr>
+                        </div>
+                        {/* EXPANDED ROW */}
                         {expandedRowIndex === rowIndex && (
-                            <tr className="bg-gray-50">
-                                <td colSpan={headers.length} className="px-6 py-4 border-b ">
-                                    <div className="text-sm space-y-1 flex justify-between items-center">
-                                        <div><strong>DOB:</strong> {row["Dob"]}</div>
-                                        <div><strong>Gender:</strong> {row["Gender"]}</div>
-                                        <div><strong>Firm Name:</strong> {row["Firm Name"]}</div>
-                                        <div><strong>Address:</strong> {row["Address"]}</div>
-                                    </div>
-                                </td>
-                            </tr>
+                            <div className="bg-gray-100 px-6 py-4 text-sm grid grid-cols-4  rounded-t-lg gap-4 border-t">
+                                <div>
+                                    <strong>DOB:</strong>
+                                    <div className="text-gray-700">{row["Dob"]}</div>
+                                </div>
+
+                                <div>
+                                    <strong>Gender:</strong>
+                                    <div className="text-gray-700">{row["Gender"]}</div>
+                                </div>
+
+                                <div>
+                                    <strong>Firm Name:</strong>
+                                    <div className="text-gray-700">{row["Firm Name"]}</div>
+                                </div>
+
+                                <div>
+                                    <strong>Email:</strong>
+                                    <div className="text-gray-700 break-all">{row["Email"]}</div>
+                                </div>
+
+                                {/* Full width field */}
+                                <div className="col-span-4">
+                                    <strong>Address:</strong>
+                                    <div className="text-gray-700">{row["Address"]}</div>
+                                </div>
+                            </div>
                         )}
-                    </tbody>
+
+                    </div>
                 ))}
-            </table>
+            </div>
         </div>
     );
 }

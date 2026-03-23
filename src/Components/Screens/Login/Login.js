@@ -2,34 +2,99 @@ import { useNavigate } from "react-router-dom";
 import InputComponents from "../../CustomComponents/InputComponents/InputComponents";
 import PrimaryButtonComponent from "../../CustomComponents/PrimaryButtonComponent/PrimaryButtonComponent";
 import { apiCall, Spinner } from "../../Utils/AxiosUtils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { API_URLS } from "../../Utils/AppConst";
+import BannerBackground from "../../../Assets/Bannerbackground.png";
+import LogoImage from "../../../Assets/logo.jpg.jpeg";
 
 function Login() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState({});
+    const [otpSent, setOtpSent] = useState(false);
+    const [otpTimer, setOtpTimer] = useState(0);
     const [loginFormData, setLoginFormData] = useState({
         contact_number: "",
-        password: ""
+        otp: ""
     });
+    useEffect(() => {
+        let interval = null;
+        if (otpSent && otpTimer > 0) {
+            interval = setInterval(() => {
+                setOtpTimer(prev => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [otpTimer, otpSent]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setLoginFormData({ ...loginFormData, [name]: value });
         setErrors(errors => ({ ...errors, [name]: "" }));
     };
+    const validate = () => {
+        const newErrors = {};
 
-    const loginCallback = (response) => {
+        if (!loginFormData.contact_number.trim()) {
+            newErrors.contact_number = "Please enter mobile number";
+        } else if (!/^[6-9]\d{9}$/.test(loginFormData.contact_number)) {
+            newErrors.contact_number = "Enter valid 10-digit mobile number";
+        }
+
+        if (otpSent && !loginFormData.otp.trim()) {
+            newErrors.otp = "OTP is required";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+    const sendOtpCallback = (response) => {
+        setLoading(false);
         if (response.status === 200) {
-            toast.success("Login successful!", {
+            toast.success("OTP sent successfully!", {
                 position: "top-center",
                 autoClose: 2000,
             });
-            setTimeout(() => {
-                navigate("/dashboard");
-            }, 2000);
+            setOtpSent(true);
+            setOtpTimer(60);
+            setLoginFormData(prev => ({ ...prev, otp: "" }));
         } else {
-            // console.log("login failed");
+            const errorMsg = response?.data?.error || "Failed to send OTP";
+            toast.error(errorMsg, {
+                position: "top-center",
+                autoClose: 2000,
+            });
+        }
+    };
+    const handleSendOtp = () => {
+        if (!validate()) return;
+        setLoading(true);
+        apiCall({
+            method: "POST",
+            url: API_URLS.SEND_OTP,
+            data: { contact_number: loginFormData.contact_number },
+            callback: sendOtpCallback,
+            setLoading
+        });
+    };
+    const handleResendOtp = () => {
+        setOtpTimer(60);
+        apiCall({
+            method: "POST",
+            url: API_URLS.SEND_OTP,
+            data: { contact_number: loginFormData.contact_number },
+            callback: sendOtpCallback,
+            setLoading
+        });
+    };
+    const loginCallback = (response) => {
+        if (response.status === 200) {
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('loggedInUser', JSON.stringify(response.data.user));
+            localStorage.setItem('token', response.data.token);
+            navigate("/dashboard");
+        } else {
             const errorMsg = response?.data?.error || "Login failed. Please check your credentials.";
             toast.error(errorMsg, {
                 position: "top-center",
@@ -37,55 +102,40 @@ function Login() {
             });
         }
     };
-    const validateLogin = () => {
-        const newErrors = {};
-        if (!loginFormData.contact_number.trim()) {
-            newErrors.contact_number = "Please Enter Contact Number";
-        } else if (loginFormData.contact_number.length !== 10) {
-            newErrors.contact_number = "Contact number must be 10 digits";
-        }
-
-        if (!loginFormData.password.trim()) {
-            newErrors.password = "Please Enter Password";
-        }
-        setErrors(newErrors);
-    };
-
     const handleLoginClick = () => {
-        validateLogin();
-        if (!loginFormData.contact_number.trim() || loginFormData.contact_number.length !== 10 || !loginFormData.password.trim()) {
-            return;
-
-        }
+        if (!validate()) return;
+        setLoading(true);
         apiCall({
             method: "POST",
-            url: "https://image-edit-backend.vercel.app/api/users/login",
+            url: API_URLS.LOGIN,
             data: loginFormData,
             callback: loginCallback,
-            setLoading: setLoading
+            setLoading
         });
     };
     return (
         <div
             className="h-screen w-screen bg-cover bg-center flex items-center justify-center"
-            style={{
-                backgroundImage:
-                    "url('https://cdn.vectorstock.com/i/500p/45/63/wave-green-background-abstract-modern-vector-48874563.jpg')",
-            }}
+            style={{ backgroundImage: `url(${BannerBackground})` }}
         >
-            <div className="bg-white  p-10 rounded-xl shadow-2xl w-full max-w-lg mx-4">
+            <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg mx-4 relative">
                 {loading && <Spinner />}
-                <div className="text-3xl font-bold text-black text-center mb-8">
-                    Welcome To Image Editor
+                <div className="flex justify-center mb-4 ">
+                    <img src={LogoImage} alt="Logo" className="w-58 h-64 object-contain" />
+                </div>
+
+                <div className="text-3xl font-bold text-black mb-12 text-center ">
+                    {/* Welcome To BannerWala */}
+                    Login
                 </div>
 
                 <InputComponents
                     type="text"
                     name="contact_number"
                     placeholder="Mobile No"
-                    inputClassName="w-full"
-                    value={loginFormData.contact_number}
+                    inputClassName="w-full mb-12"
                     error={errors.contact_number}
+                    value={loginFormData.contact_number}
                     onChange={(e) => {
                         const input = e.target.value.replace(/\D/g, '');
                         if (input.length <= 10) {
@@ -95,23 +145,60 @@ function Login() {
                     }}
                     maxLength={10}
                 />
-                <InputComponents
-                    type="text"
-                    name="password"
-                    placeholder="Password"
-                    inputClassName="w-full mt-4 mb-4"
-                    value={loginFormData.password}
-                    error={errors.password}
-                    onChange={handleInputChange}
-                />
-
-                <PrimaryButtonComponent
-                    label={loading ? "Logging in..." : "Log In"}
-                    onClick={handleLoginClick}
-                    buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-serif font-bold rounded-lg hover:bg-blue-700 transition duration-200"
-                />
+                {otpSent && (
+                    <>
+                        <InputComponents
+                            type="text"
+                            name="otp"
+                            placeholder="OTP"
+                            value={loginFormData.otp}
+                            onChange={handleInputChange}
+                            maxLength={6}
+                            error={errors.otp}
+                            inputClassName="w-full mb-4"
+                        />
+                        <div className="text-sm text-gray-600 mb-4">
+                            {otpTimer > 0 ? (
+                                <span>
+                                    Resend OTP in{" "}
+                                    <b>
+                                        {Math.floor(otpTimer / 60)}:
+                                        {(otpTimer % 60)
+                                            .toString()
+                                            .padStart(2, "0")}
+                                    </b>
+                                </span>
+                            ) : (
+                                <span>
+                                    <span className="text-black">Didn't Receive? </span>
+                                    <span
+                                        className="text-blue-600 cursor-pointer font-bold"
+                                        onClick={handleResendOtp}
+                                    >
+                                        Resend OTP
+                                    </span>
+                                </span>
+                            )}
+                        </div>
+                    </>
+                )}
+                <div className="flex justify-center">
+                    {!otpSent ? (
+                        <PrimaryButtonComponent
+                            label="Send OTP"
+                            onClick={handleSendOtp}
+                            buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg"
+                        />
+                    ) : (
+                        <PrimaryButtonComponent
+                            label="Verify & Login"
+                            onClick={handleLoginClick}
+                            buttonClassName="w-full py-4 text-lg bg-blue-600 text-white font-bold rounded-lg"
+                        />
+                    )}
+                </div>
             </div>
-        </div>
+        </div >
     );
 }
 
